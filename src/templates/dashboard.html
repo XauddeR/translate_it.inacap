@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Translate It - Dashboard</title>
+</head>
+
+<body class="bg-white text-gray-800 min-h-screen font-sans">
+
+  <header class="border-b border-gray-200 bg-white">
+    <div class="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
+      <h1 class="text-2xl font-bold text-blue-600">
+        <a href="/">Translate It</a>
+      </h1>
+      <nav class="space-x-6 text-sm font-medium flex items-center">
+        <a href="/" class="text-gray-600 hover:text-blue-600 transition">INICIO</a>
+        {% if current_user.rol == 'admin' %}
+          <a href="{{ url_for('admin.admin_dashboard') }}" class="text-blue-600 hover:text-blue-700 transition">
+            PANEL ADMIN
+          </a>
+        {% endif %}
+        <a href="{{ url_for('auth.logout') }}" class="text-red-500 hover:text-red-600 font-medium">CERRAR SESIÓN</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="flex min-h-screen">
+    <aside class="w-56 bg-gradient-to-b from-blue-50 to-blue-100 text-gray-700 flex flex-col shadow-inner">
+      <nav class="flex-1 px-4 py-6">
+        <ul class="space-y-3 text-sm">
+          <li>
+            <a href="#" class="block py-2 px-3 rounded-md hover:bg-blue-200 transition">
+              MI PERFIL
+            </a>
+          </li>
+          <li>
+            <a href="#" class="block py-2 px-3 rounded-md hover:bg-blue-200 transition">
+              SOPORTE
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main id="mainContent" class="flex-1 p-10 bg-gray-50">
+      <h1 class="text-3xl font-bold text-blue-700 mb-6">Comienza a traducir</h1>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+          <h2 class="text-xl font-semibold text-gray-800 mb-2">Subir video</h2>
+          <p class="text-sm text-gray-500 mb-4">Carga un video y obtén tus traducciones <br> <span class="text-red-400 italic">Archivos compatibles: mp4, mkv, mov y avi</span></p>
+          <a href="{{ url_for('upload.upload_file') }}" class="bg-blue-600 text-white font-medium px-4 py-2 rounded-md hover:bg-blue-700 transition">
+            Subir
+          </a>
+        </div>
+
+        <div class="p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+          <h2 class="text-xl font-semibold text-gray-800 mb-2">Mis Archivos</h2>
+          <p class="text-sm text-gray-500 mb-4">Consulta el historial de los videos que has procesado.</p>
+          <a href="{{ url_for('main.history') }}"  class="bg-blue-100 text-blue-700 font-medium px-4 py-2 rounded-md hover:bg-blue-200 transition">
+            Ver archivos
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+    <footer class="bg-gray-50 border-t border-gray-200 py-6">
+    <div class="max-w-7xl mx-auto text-center">
+      <p class="text-sm text-gray-500">&copy; 2025 Translate It. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+</body>
+</html>

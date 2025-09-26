@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Detalle de Archivo</title>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <header class="border-b border-gray-200 bg-white">
+    <div class="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
+      <h1 class="text-2xl font-bold text-blue-600">
+        <a href="/">Translate It</a>
+      </h1>
+      <nav class="space-x-6 text-sm font-medium flex items-center">
+        <a href="/" class="text-gray-600 hover:text-blue-600 transition">INICIO</a>
+        <a href="{{ url_for('main.dashboard') }}" class="text-gray-600 hover:text-blue-600 transition">PANEL DE USUARIO</a>
+        <a href="{{ url_for('auth.logout') }}" class="text-red-500 hover:text-red-600 font-medium">CERRAR SESIÓN</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container mx-auto py-8">
+    <h1 class="text-2xl font-bold text-blue-600 mb-6">{{ archivo.filename }}</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <video controls class="w-full rounded-lg shadow">
+          <source src="{{ url_for('main.file_video', filename=archivo.filename) }}" type="video/mp4">
+          Tu navegador no soporta la reproducción de video.
+        </video>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <h2 class="font-semibold text-gray-800">Transcripción</h2>
+          <p class="p-3 bg-white rounded-md shadow text-gray-700 whitespace-pre-line">
+            {{ archivo.transcripcion }}
+          </p>
+        </div>
+        <div>
+          <h2 class="font-semibold text-gray-800">Traducción ({{ archivo.idioma_destino }})</h2>
+          <p class="p-3 bg-blue-50 rounded-md shadow text-gray-800 whitespace-pre-line">
+            {{ archivo.traduccion }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

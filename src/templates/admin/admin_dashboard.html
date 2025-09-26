@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Translate It - Dashboard</title>
+</head>
+
+<body class="bg-white text-gray-800 min-h-screen font-sans flex flex-col">
+  <header class="border-b border-gray-200 bg-white">
+    <div class="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
+      <h1 class="text-2xl font-bold text-blue-600">
+        <a href="/">Translate It</a>
+      </h1>
+      <nav class="space-x-6 text-sm font-medium flex items-center">
+        <a href="/" class="text-gray-600 hover:text-blue-600 transition">INICIO</a>
+        <a href="{{ url_for('auth.logout') }}" class="text-red-500 hover:text-red-600 font-medium">CERRAR SESIÓN</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="flex flex-1">
+    <aside class="w-56 bg-gradient-to-b from-blue-50 to-blue-100 text-gray-700 flex flex-col shadow-inner">
+      <nav class="flex-1 px-4 py-6">
+        <ul class="space-y-3 text-sm">
+          <li>
+            <a href="{{ url_for('admin.view_users') }}" class="block py-2 px-3 rounded-md hover:bg-blue-200 transition">
+              USUARIOS REGISTRADOS
+            </a>
+          </li>
+          <li>
+            <a href="#" class="block py-2 px-3 rounded-md hover:bg-blue-200 transition">
+              SOPORTE
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main id="mainContent" class="flex-1 p-10 bg-gray-50">
+      <h1 class="text-3xl font-bold text-blue-700 mb-6">Panel de Administración</h1>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="bg-white shadow rounded-lg p-6 text-center">
+          <h2 class="text-xl font-bold text-blue-600">Usuarios</h2>
+          <p class="text-3xl font-bold mt-2">{{ total_users }}</p>
+        </div>
+        <div class="bg-white shadow rounded-lg p-6 text-center">
+          <h2 class="text-xl font-bold text-green-600">Administradores</h2>
+          <p class="text-3xl font-bold mt-2">{{ total_admins }}</p>
+        </div>
+        <div class="bg-white shadow rounded-lg p-6 text-center">
+          <h2 class="text-xl font-bold text-purple-600">Archivos Subidos</h2>
+          <p class="text-3xl font-bold mt-2">{{ total_archivos }}</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="bg-gray-50 border-t border-gray-200 py-6">
+    <div class="max-w-7xl mx-auto text-center">
+      <p class="text-sm text-gray-500">&copy; 2025 Translate It. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
