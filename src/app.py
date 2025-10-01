@@ -30,15 +30,14 @@ def translateit():
     @login_manager.user_loader
     def load_user(user_id):
         cursor = mysql.connection.cursor()
-        cursor.execute("SELECT * FROM usuarios WHERE id = %s", (user_id,))
+        cursor.execute('SELECT * FROM USUARIOS WHERE ID = %s', (user_id,))
         row = cursor.fetchone()
         cursor.close()
         if row:
             return User.from_db({
                 'id': row[0],
                 'usuario': row[1],
-                'email': row[2],
-                'rol': row[5]
+                'email': row[2]
             })
         return None
 

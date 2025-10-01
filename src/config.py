@@ -8,6 +8,7 @@ class Config:
 
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
     DEEPL_API_KEY = os.getenv('DEEPL_API_KEY')
+    ASSEMBLYAI_API_KEY = os.getenv('ASSEMBLYAI_API_KEY')
 
     MYSQL_HOST = os.environ.get('MYSQL_HOST')
     MYSQL_USER = os.environ.get('MYSQL_USER')

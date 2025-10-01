@@ -36,7 +36,6 @@
             <th class="p-3 text-left">ID</th>
             <th class="p-3 text-left">Usuario</th>
             <th class="p-3 text-left">Correo</th>
-            <th class="p-3 text-left">Rol</th>
             <th class="p-3 text-left">Acciones</th>
           </tr>
         </thead>
@@ -46,7 +45,6 @@
             <td class="p-3">{{ u.ID }}</td>
             <td class="p-3">{{ u.USUARIO }}</td>
             <td class="p-3">{{ u.EMAIL }}</td>
-            <td class="p-3">{{ u.ROL }}</td>
             <td class="p-3 space-x-2">
               <a href="{{ url_for('admin.update_user', user_id=u.ID) }}" 
                  class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">Editar</a>

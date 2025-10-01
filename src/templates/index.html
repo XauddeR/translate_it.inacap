@@ -14,7 +14,7 @@
         <a href="/">Translate It</a>
       </h1>
       <nav class="space-x-6 text-sm font-medium flex items-center">
-        {% if current_user.rol == 'admin' %}
+        {% if current_user.is_admin == True %}
           <a href="{{ url_for('admin.admin_dashboard') }}" class="text-blue-600 hover:text-blue-700 transition">
             PANEL ADMIN
           </a>

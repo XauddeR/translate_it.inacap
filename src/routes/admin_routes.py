@@ -10,7 +10,7 @@ admin_bp = Blueprint('admin', __name__)
 def admin_required(func):
     @wraps(func)
     def view(*args, **kwargs):
-        if not current_user.is_authenticated or current_user.rol != 'admin':
+        if not current_user.is_authenticated or not current_user.is_admin:
             abort(403)
         return func(*args, **kwargs)
     return view
@@ -24,10 +24,9 @@ def admin_dashboard():
     cursor.execute('SELECT COUNT(*) AS TOTAL_USUARIOS FROM USUARIOS')
     total_users = cursor.fetchone()['TOTAL_USUARIOS']
 
-    admin = 'admin'
-    cursor.execute('SELECT COUNT(*) AS TOTAL_ADMINS FROM USUARIOS WHERE ROL = %s', (admin,))
+    cursor.execute('SELECT COUNT(*) AS TOTAL_ADMINS FROM administradores')
     total_admins = cursor.fetchone()['TOTAL_ADMINS']
-
+    
     cursor.execute('SELECT COUNT(*) AS TOTAL_ARCHIVOS FROM ARCHIVOS')
     total_archivos = cursor.fetchone()['TOTAL_ARCHIVOS']
 
@@ -48,7 +47,7 @@ def admin_dashboard():
 @admin_required
 def view_users():
     cursor = mysql.connection.cursor(DictCursor)
-    cursor.execute('SELECT ID, USUARIO, EMAIL, ROL FROM USUARIOS ORDER BY FECHA_REGISTRO DESC')
+    cursor.execute('SELECT ID, USUARIO, EMAIL FROM USUARIOS ORDER BY FECHA_REGISTRO ASC')
     users = cursor.fetchall()
     cursor.close()
     return render_template('admin/view_user.html', users = users)
@@ -74,14 +73,13 @@ def update_user(user_id):
     if request.method == 'POST':
         user = request.form['usuario']
         email = request.form['email']
-        role = request.form['rol']
-        cursor.execute('UPDATE USUARIOS SET USUARIO = %s, EMAAIL = %s, ROL = %s WHERE ID = %s', (user, email, role, user_id))
+        cursor.execute('UPDATE USUARIOS SET USUARIO = %s, EMAIL = %s WHERE ID = %s', (user, email, user_id))
         mysql.connection.commit()
         cursor.close()
         flash('Usuario actualizado correctamente', 'update_success')
         return redirect(url_for('admin.view_users'))
     else:
-        cursor.execute('SELECT ID, USUARIO, EMAIL, ROL FROM USUARIOS WHERE ID = %s', (user_id,))
+        cursor.execute('SELECT ID, USUARIO, EMAIL FROM USUARIOS WHERE ID = %s', (user_id,))
         user = cursor.fetchone()
         cursor.close()
         return render_template('admin/update_user.html', user = user)
@@ -95,11 +93,10 @@ def add_user():
         user = request.form['usuario']
         email = request.form['email']
         password = request.form['password']
-        rol = request.form['rol']
         hashed_password = generate_password_hash(password)
 
         cursor = mysql.connection.cursor(DictCursor)
-        cursor.execute('INSERT INTO USUARIOS (USUARIO, EMAIL, PASSWORD_BCRYPT, ROL) VALUES (%s, %s, %s, %s)', (user, email, hashed_password, rol))
+        cursor.execute('INSERT INTO USUARIOS (USUARIO, EMAIL, PASSWORD_BCRYPT) VALUES (%s, %s, %s)', (user, email, hashed_password))
         mysql.connection.commit()
         cursor.close()
         flash('Usuario creado exitosamente', 'add_success')
