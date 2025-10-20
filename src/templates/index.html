@@ -7,9 +7,10 @@
   <title>Translate It</title>
 </head>
 
-<body class="bg-white text-gray-800 font-sans">
-  <header class="border-b border-gray-200">
-    <div class="max-w-7xl mx-auto flex items-center justify-between py-6 px-6">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+  
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-between py-5 px-6">
       <h1 class="text-3xl font-extrabold text-blue-600 tracking-tight">
         <a href="/">Translate It</a>
       </h1>
@@ -22,23 +23,20 @@
 
         {% if current_user.is_authenticated %}
           <a href="{{ url_for('main.dashboard') }}"
-            class="text-gray-600 hover:text-blue-600 transition">
+             class="text-slate-600 hover:text-blue-600 transition">
             PANEL DE USUARIO
           </a>
-
           <a href="{{ url_for('auth.logout') }}"
-            class="text-red-500 hover:text-red-600 font-medium">
+             class="text-red-500 hover:text-red-600 font-medium">
             CERRAR SESIÓN
           </a>
-
         {% else %}
           <a href="{{ url_for('auth.login') }}"
-            class="text-gray-600 hover:text-blue-600 transition">
+             class="text-slate-600 hover:text-blue-600 transition">
             INICIAR SESIÓN
           </a>
-
           <a href="{{ url_for('auth.register') }}"
-            class="text-gray-600 hover:text-blue-600 transition">
+             class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
             REGISTRARSE
           </a>
         {% endif %}
@@ -46,24 +44,81 @@
     </div>
   </header>
 
-  <section class="text-center py-20 bg-gradient-to-r from-blue-50 to-blue-100">
-    <h2 class="text-5xl font-extrabold text-gray-900">Transcriptions in your own path</h2>
-    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-      Accede a contenido audiovisual en cualquier idioma con ayuda de <span class="text-blue-600 font-semibold">Translate It</span>.
-    </p>
+  <section class="relative h-[500px] bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1644088379091-d574269d422f?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1993');">
+    <div class="absolute inset-0 bg-blue-900 bg-opacity-30"></div>
+    
+    <div class="relative z-10 h-full flex flex-col justify-center items-center text-center px-6">
+      <h2 class="text-5xl font-extrabold text-white tracking-tight leading-tight">
+        Mejora tu entendimiento con IA
+      </h2>
+      <p class="mt-4 text-xl text-blue-100 max-w-2xl mx-auto">
+        Potenciado por <span class="font-semibold">Whisper</span> y <span class="font-semibold">DeepL</span> para una gran precisión. Rompe la barrera del idioma.
+      </p>
+      
+      <div class="mt-10">
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('main.dashboard') }}" class="px-8 py-3 bg-white text-blue-700 font-semibold rounded-lg shadow-md hover:bg-slate-100 transition text-base">
+                Ir al Panel
+            </a>
+        {% endif %}
+      </div>
+    </div>
   </section>
 
-  <section class="max-w-5xl mx-auto px-6 py-16">
-    <h2 class="text-3xl font-bold text-gray-900 text-center">Sobre Translate It</h2>
-    <p class="mt-6 text-lg text-gray-600 text-center leading-relaxed">
-      Translate It te permite romper las barreras del idioma, ofreciendo traducciones precisas y subtítulos 
-      sincronizados en tus videos favoritos. Todo con un diseño minimalista y moderno para que te concentres en lo que importa: aprender.
-    </p>
+  <section class="max-w-7xl mx-auto px-6 py-24">
+    <div class="text-center max-w-3xl mx-auto">
+      <h2 class="text-4xl font-extrabold text-slate-900">
+        Diseñado para la Claridad y Precisión
+      </h2>
+      <p class="mt-4 text-lg text-slate-600 leading-relaxed">
+        Translate It combina lo mejor de la inteligencia artificial para ofrecer transcripciones y traducciones en las que puedes confiar.
+      </p>
+    </div>
+
+    <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transform hover:-translate-y-1 transition duration-300">
+        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15c-2.21 0-4-1.79-4-4v-1.5a4 4 0 018 0v1.5c0 2.21-1.79 4-4 4z" />
+          </svg>
+        </div>
+        <h3 class="mt-5 text-xl font-semibold text-slate-900">Transcripción de Vanguardia</h3>
+        <p class="mt-2 text-base text-slate-600">
+          Utilizamos <span class="font-medium text-slate-800">Whisper</span> de OpenAI para convertir audio en texto con una precisión asombrosa, reconociendo múltiples acentos e idiomas.
+        </p>
+      </div>
+
+      <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transform hover:-translate-y-1 transition duration-300">
+        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c.24 0 .468.02.69.055M12 21c-.24 0-.468.02-.69.055M11.25 3.75l-3.75 6H11.25m4.125 0l-3.75 6H15m-3.75 0l3.75-6.75M11.25 3.75l3.75 6.75M17.25 3.75l-3.75 6.75" />
+          </svg>
+        </div>
+        <h3 class="mt-5 text-xl font-semibold text-slate-900">Traducción Superior con IA</h3>
+        <p class="mt-2 text-base text-slate-600">
+          Integrado con <span class="font-medium text-slate-800">DeepL</span>, ofrecemos traducciones fluidas y naturales que capturan el matiz, no solo las palabras.
+        </p>
+      </div>
+
+      <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transform hover:-translate-y-1 transition duration-300">
+        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+          </svg>
+        </div>
+        <h3 class="mt-5 text-xl font-semibold text-slate-900">Diseño Limpio y Moderno</h3>
+        <p class="mt-2 text-base text-slate-600">
+          Una interfaz minimalista diseñada para que te concentres en lo que importa: tu contenido. Sin distracciones, solo eficiencia.
+        </p>
+      </div>
+
+    </div>
   </section>
 
-  <footer class="bg-gray-50 border-t border-gray-200 py-6">
+  <footer class="bg-slate-100 border-t border-slate-200 py-8">
     <div class="max-w-7xl mx-auto text-center">
-      <p class="text-sm text-gray-500">&copy; 2025 Translate It. Todos los derechos reservados.</p>
+      <p class="text-sm text-slate-500">&copy; 2025 Translate It. Todos los derechos reservados.</p>
     </div>
   </footer>
 </body>

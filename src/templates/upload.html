@@ -41,7 +41,7 @@
         <div class="mt-4 space-y-2">
           {% for category, message in messages %}
             {% if "upload" in category %}
-              <div class="p-3 rounded-lg text-sm
+              <div class="flash-message p-3 rounded-lg text-sm
                 {% if "success" in category %} bg-green-100 text-green-700
                 {% elif "error" in category %} bg-red-100 text-red-700
                 {% else %} bg-blue-100 text-blue-700
@@ -56,4 +56,14 @@
 
   </div>
 </body>
+
+<script>
+  setTimeout(() => {
+    const flashes = document.querySelectorAll('.flash-message');
+    flashes.forEach(flash => {
+      flash.classList.add('opacity-0', 'transition', 'duration-700');
+      setTimeout(() => flash.remove(), 700);
+    });
+  }, 5000);
+</script>
 </html>

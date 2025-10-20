@@ -18,7 +18,7 @@
               {{ message }}
             </div>
           {% else %}
-            <div class="mb-4 p-3 rounded bg-gray-100 text-gray-800 border border-gray-300 text-sm">
+            <div class="flash-message mb-4 p-3 rounded bg-gray-100 text-gray-800 border border-gray-300 text-sm">
               {{ message }}
             </div>
           {% endif %}
@@ -48,4 +48,14 @@
     </p>
   </div>
 </body>
+
+<script>
+  setTimeout(() => {
+    const flashes = document.querySelectorAll('.flash-message');
+    flashes.forEach(flash => {
+      flash.classList.add('opacity-0', 'transition', 'duration-700');
+      setTimeout(() => flash.remove(), 700);
+    });
+  }, 5000);
+</script>
 </html>
