@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,15 +7,15 @@
   <title>Translate It - Dashboard</title>
 </head>
 
-<body class="bg-white text-gray-800 min-h-screen font-sans">
+<body class="bg-slate-50 text-slate-800 min-h-screen font-sans antialiased flex flex-col">
 
-  <header class="border-b border-gray-200 bg-white">
-    <div class="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
-      <h1 class="text-2xl font-bold text-blue-600">
-        <a href="/">Translate It</a>
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-between py-5 px-6">
+      <h1 class="text-3xl font-extrabold text-blue-600 tracking-tight">
+        <a href="{{ url_for('main.index') }}">Translate It</a>
       </h1>
       <nav class="space-x-6 text-sm font-medium flex items-center">
-        <a href="/" class="text-gray-600 hover:text-blue-600 transition">INICIO</a>
+        <a href="{{ url_for('main.index') }}" class="text-slate-600 hover:text-blue-600 transition">INICIO</a>
         {% if current_user.is_admin == True %}
           <a href="{{ url_for('admin.admin_dashboard') }}" class="text-blue-600 hover:text-blue-700 transition">
             PANEL ADMIN
@@ -27,40 +26,66 @@
     </div>
   </header>
 
-  <div class="flex min-h-screen">
-    <aside class="w-56 bg-gradient-to-b from-blue-50 to-blue-100 text-gray-700 flex flex-col shadow-inner">
+  <div class="flex flex-1">
+    
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col">
       <nav class="flex-1 px-4 py-6">
-        <ul class="space-y-3 text-sm">
+        <ul class="space-y-2 text-sm">
           <li>
-            <a href="#" class="block py-2 px-3 rounded-md hover:bg-blue-200 transition">
-              MI PERFIL
+            <a href="{{ url_for('main.dashboard') }}" 
+               class="flex items-center space-x-3 py-2 px-3 rounded-md transition font-semibold bg-blue-50 text-blue-700">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h12A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6zM3.75 12H6m1.5 0h.008m.007 0H9m.75 0h.008m.007 0h.75m3 0h.008m.007 0h.75m1.5 0h.008m.007 0H18m-9 3.75h.008m.007 0h.75m1.5 0h.008m.007 0h.75m-3-7.5h.008m.007 0h.75m1.5 0h.008m.007 0h.75" />
+              </svg>
+              <span>Dashboard</span>
             </a>
           </li>
           <li>
-            <a href="#" class="block py-2 px-3 rounded-md hover:bg-blue-200 transition">
-              SOPORTE
+            <a href="#" class="flex items-center space-x-3 py-2 px-3 rounded-md transition text-slate-600 hover:bg-blue-50 hover:text-blue-700">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+              <span>Mi Perfil</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center space-x-3 py-2 px-3 rounded-md transition text-slate-600 hover:bg-blue-50 hover:text-blue-700">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+              </svg>
+              <span>Soporte</span>
             </a>
           </li>
         </ul>
       </nav>
     </aside>
 
-    <main id="mainContent" class="flex-1 p-10 bg-gray-50">
-      <h1 class="text-3xl font-bold text-blue-700 mb-6">Comienza a traducir</h1>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
-          <h2 class="text-xl font-semibold text-gray-800 mb-2">Subir video</h2>
-          <p class="text-sm text-gray-500 mb-4">Carga un video y obtén tus traducciones <br> <span class="text-red-400 italic">Archivos compatibles: mp4, mkv, mov y avi</span></p>
-          <a href="{{ url_for('upload.upload_file') }}" class="bg-blue-600 text-white font-medium px-4 py-2 rounded-md hover:bg-blue-700 transition">
+    <main id="mainContent" class="flex-1 p-10 bg-slate-50">
+      <h1 class="text-4xl font-extrabold text-slate-900 mb-8">Comienza a traducir</h1>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="p-8 bg-white rounded-xl shadow-lg border border-slate-200 transform hover:-translate-y-1 transition duration-300">
+          <h2 class="text-2xl font-semibold text-slate-900 mb-3">Subir video</h2>
+          <p class="text-base text-slate-600 mb-6">
+            Carga un video y obtén tus traducciones al instante.
+            <br> 
+            <span class="text-sm text-slate-500 italic">Formatos compatibles: mp4, mkv, mov y avi.</span>
+          </p>
+          <a href="{{ url_for('upload.upload_file') }}" 
+             class="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-sm hover:bg-blue-700 transition-all duration-300
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             Subir
           </a>
         </div>
 
-        <div class="p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
-          <h2 class="text-xl font-semibold text-gray-800 mb-2">Mis Archivos</h2>
-          <p class="text-sm text-gray-500 mb-4">Consulta el historial de los videos que has procesado.</p>
-          <a href="{{ url_for('main.history') }}"  class="bg-blue-100 text-blue-700 font-medium px-4 py-2 rounded-md hover:bg-blue-200 transition">
+        <div class="p-8 bg-white rounded-xl shadow-lg border border-slate-200 transform hover:-translate-y-1 transition duration-300">
+          <h2 class="text-2xl font-semibold text-slate-900 mb-3">Mis Archivos</h2>
+          <p class="text-base text-slate-600 mb-6">
+            Consulta el historial de todos los videos que has procesado y descarga tus transcripciones.
+          </p>
+          <a href="{{ url_for('main.history') }}" 
+             class="inline-block px-6 py-3 bg-white text-blue-700 font-semibold rounded-lg shadow-sm border border-slate-300 
+                    hover:bg-slate-50 transition-all duration-300
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             Ver archivos
           </a>
         </div>
@@ -68,9 +93,9 @@
     </main>
   </div>
 
-    <footer class="bg-gray-50 border-t border-gray-200 py-6">
+  <footer class="bg-slate-100 border-t border-slate-200 py-8">
     <div class="max-w-7xl mx-auto text-center">
-      <p class="text-sm text-gray-500">&copy; 2025 Translate It. Todos los derechos reservados.</p>
+      <p class="text-sm text-slate-500">&copy; 2025 Translate It. Todos los derechos reservados.</p>
     </div>
   </footer>
 </body>

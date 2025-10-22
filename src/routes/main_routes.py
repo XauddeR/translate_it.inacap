@@ -1,9 +1,10 @@
 import os
-from flask import Blueprint, render_template, abort, send_from_directory, current_app
+from flask import Blueprint, render_template, abort, send_from_directory, flash, redirect, url_for, send_file, request, current_app
 from werkzeug.utils import secure_filename
 from MySQLdb.cursors import DictCursor
 from flask_login import current_user, login_required
 from utils.extensions import mysql
+from io import BytesIO
 
 main_bp = Blueprint('main', __name__)
 
@@ -53,4 +54,67 @@ def file_video(filename):
 
     return send_from_directory(upload_folder, safe_filename, as_attachment = False)
 
+@main_bp.route('/update_file/<int:archivo_id>', methods=['POST'])
+@login_required
+def update_file(archivo_id):
+    nuevo_nombre = request.form['filename']
+    cursor = mysql.connection.cursor()
+    cursor.execute(
+        '''
+        UPDATE archivos 
+        SET nombre_archivo = %s 
+        WHERE id = %s AND usuario_id = %s
+        ''',
+        (nuevo_nombre, archivo_id, current_user.id)
+    )
+    mysql.connection.commit()
+    cursor.close()
 
+    flash('Título del archivo actualizado correctamente.', 'update_success')
+    return redirect(url_for('main.history'))
+
+@main_bp.route('/delete_file/<int:archivo_id>', methods=['POST'])
+@login_required
+def delete_file(archivo_id):
+    cursor = mysql.connection.cursor()
+    cursor.execute(
+        'DELETE FROM archivos WHERE id = %s AND usuario_id = %s',
+        (archivo_id, current_user.id)
+    )
+    mysql.connection.commit()
+    cursor.close()
+    flash('Archivo eliminado del historial.', 'delete_success')
+    return redirect(url_for('main.history'))
+
+@main_bp.route('/download/<int:archivo_id>')
+@login_required
+def download(archivo_id):
+    cursor = mysql.connection.cursor(DictCursor)
+    cursor.execute(
+        '''
+        SELECT traduccion, nombre_archivo, filename, usuario_id FROM archivos WHERE id = %s
+        ''',
+        (archivo_id,)
+    )
+    archivo = cursor.fetchone()
+    cursor.close()
+
+    if not archivo:
+        abort(404, 'Archivo no encontrado.')
+
+    if archivo['usuario_id'] != current_user.id:
+        abort(403, 'No tienes permiso para descargar este archivo.')
+
+    nombre = archivo['nombre_archivo'] or archivo['filename']
+    nombre_txt = f'{nombre.rsplit('.', 1)[0]}_traduccion.txt'
+
+    buffer = BytesIO()
+    buffer.write(archivo['traduccion'].encode('utf-8'))
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment = True,
+        download_name = nombre_txt,
+        mimetype = 'text/plain'
+    )
