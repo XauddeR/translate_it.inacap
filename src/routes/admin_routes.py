@@ -93,7 +93,6 @@ def add_user():
     email = request.form['email']
     password = request.form['password']
     nivel = request.form['nivel']
-
     hashed_password = generate_password_hash(password)
 
     try:
@@ -111,14 +110,14 @@ def add_user():
             cursor.execute('''
                 INSERT INTO administradores (usuario_id, nivel_acceso)
                 VALUES (%s, %s)
-            ''', (usuario_id, 'total'))
+            ''', (usuario_id, 'admin'))
             mysql.connection.commit()
 
         cursor.close()
-        flash('✅ Usuario creado exitosamente.', 'add_success')
+        flash('Usuario creado exitosamente.', 'add_success')
 
     except Exception as e:
-        flash(f'❌ Error al crear usuario: {str(e)}', 'add_user_error')
+        flash(f'Error al crear usuario: {str(e)}', 'add_user_error')
 
     return redirect(url_for('admin.view_users'))
 
