@@ -85,22 +85,41 @@ def update_user(user_id):
         return render_template('admin/update_user.html', user = user)
 
 # Funcionalidad para crear un usuario desde panel de administrador
-@admin_bp.route('/add', methods = ['GET', 'POST'])
+@admin_bp.route('/add', methods = ['POST'])
 @login_required
 @admin_required
 def add_user():
-    if request.method == 'POST':
-        user = request.form['usuario']
-        email = request.form['email']
-        password = request.form['password']
-        hashed_password = generate_password_hash(password)
+    usuario = request.form['usuario']
+    email = request.form['email']
+    password = request.form['password']
+    nivel = request.form['nivel']
 
-        cursor = mysql.connection.cursor(DictCursor)
-        cursor.execute('INSERT INTO USUARIOS (USUARIO, EMAIL, PASSWORD_BCRYPT) VALUES (%s, %s, %s)', (user, email, hashed_password))
+    hashed_password = generate_password_hash(password)
+
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute('''
+            INSERT INTO usuarios (usuario, email, password_bcrypt)
+            VALUES (%s, %s, %s)
+        ''', (usuario, email, hashed_password))
         mysql.connection.commit()
+
+        cursor.execute('SELECT LAST_INSERT_ID()')
+        usuario_id = cursor.fetchone()[0]
+
+        if nivel == 'admin':
+            cursor.execute('''
+                INSERT INTO administradores (usuario_id, nivel_acceso)
+                VALUES (%s, %s)
+            ''', (usuario_id, 'total'))
+            mysql.connection.commit()
+
         cursor.close()
-        flash('Usuario creado exitosamente', 'add_success')
-        return redirect(url_for('admin.view_users'))
-    return render_template('admin/add_user.html')
+        flash('✅ Usuario creado exitosamente.', 'add_success')
+
+    except Exception as e:
+        flash(f'❌ Error al crear usuario: {str(e)}', 'add_user_error')
+
+    return redirect(url_for('admin.view_users'))
 
 
