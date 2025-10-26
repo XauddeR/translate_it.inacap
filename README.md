@@ -1,0 +1,1 @@
+Translate It es un proyecto de título que busca reducir la brecha idiomática entre el consumidor y el vídeo reproducido. Con ayuda de servicios externos basados en inteligencia artificial (planes gratuitos) como Whisper y DeepL.
