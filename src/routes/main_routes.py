@@ -12,6 +12,11 @@ main_bp = Blueprint('main', __name__)
 def index():
     return render_template('index.html')
 
+@main_bp.route('/support')
+@login_required
+def support():
+    return render_template('support.html', user = current_user)
+
 @main_bp.route('/dashboard')
 @login_required
 def dashboard():
@@ -27,11 +32,11 @@ def history():
 
     return render_template('history.html', archivos = archivos)
 
-@main_bp.route('/archivo/<int:archivo_id>')
+@main_bp.route('/archivo/<archivo_id>')
 @login_required
 def file_detail(archivo_id):
     cursor = mysql.connection.cursor(DictCursor)
-    cursor.execute('SELECT * FROM ARCHIVOS WHERE id=%s', (archivo_id,))
+    cursor.execute('SELECT * FROM ARCHIVOS WHERE id = %s', (archivo_id,))
     archivo = cursor.fetchone()
     cursor.close()
 
@@ -54,7 +59,20 @@ def file_video(filename):
 
     return send_from_directory(upload_folder, safe_filename, as_attachment = False)
 
-@main_bp.route('/update_file/<int:archivo_id>', methods=['POST'])
+@main_bp.route('/archivo/thumbnail/<filename>')
+@login_required
+def file_thumbnail(filename):
+    safe_filename = secure_filename(filename)
+    thumbnail_folder = os.path.join(current_app.root_path, 'uploads', 'thumbnail')
+    file_path = os.path.join(thumbnail_folder, safe_filename)
+
+    if not os.path.exists(file_path):
+        abort(404)
+
+    return send_from_directory(thumbnail_folder, safe_filename, as_attachment = False)
+
+
+@main_bp.route('/update_file/<archivo_id>', methods=['POST'])
 @login_required
 def update_file(archivo_id):
     nuevo_nombre = request.form['filename']
@@ -73,7 +91,7 @@ def update_file(archivo_id):
     flash('Título del archivo actualizado correctamente.', 'update_success')
     return redirect(url_for('main.history'))
 
-@main_bp.route('/delete_file/<int:archivo_id>', methods=['POST'])
+@main_bp.route('/delete_file/<archivo_id>', methods=['POST'])
 @login_required
 def delete_file(archivo_id):
     cursor = mysql.connection.cursor()
@@ -86,7 +104,7 @@ def delete_file(archivo_id):
     flash('Archivo eliminado del historial.', 'delete_success')
     return redirect(url_for('main.history'))
 
-@main_bp.route('/download/<int:archivo_id>')
+@main_bp.route('/download/<archivo_id>')
 @login_required
 def download(archivo_id):
     cursor = mysql.connection.cursor(DictCursor)

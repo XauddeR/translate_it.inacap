@@ -30,7 +30,7 @@
       <div class="lg:col-span-3 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
         <div class="aspect-w-16 aspect-h-9 bg-black">
           <video controls class="w-full h-full object-contain">
-            <source src="{{ url_for('main.file_video', filename=archivo.filename) }}" type="video/mp4">
+            <source src="{{ url_for('main.file_video', filename=archivo.ruta_video.split('/')[-1]) }}" type="video/mp4">
             Tu navegador no soporta el tag de video.
           </video>
         </div>

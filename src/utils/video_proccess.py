@@ -1,5 +1,6 @@
 import os
 from moviepy import VideoFileClip
+from flask import current_app
 
 def audio_extract(video_path, output_folder = 'src/uploads/audios'):
     os.makedirs(output_folder, exist_ok = True)
@@ -22,3 +23,19 @@ def convert_mp4(input_path):
     clip.close()
 
     return output_path
+
+def create_thumbnail(video_path, thumbnail_filename, thumbnail_folder):
+    try:
+        os.makedirs(thumbnail_folder, exist_ok=True)
+
+        thumb_save_path = os.path.join(thumbnail_folder, thumbnail_filename)
+
+        with VideoFileClip(video_path) as clip:
+            clip.save_frame(thumb_save_path, t = 1.0)
+
+        rel_path = os.path.relpath(thumb_save_path, current_app.root_path).replace("\\", "/")
+        return rel_path
+
+    except Exception as e:
+        current_app.logger.error(f'Error al crear miniatura para {thumbnail_filename}: {str(e)}')
+        return None

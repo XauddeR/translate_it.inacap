@@ -18,9 +18,11 @@ def translateit():
     login_manager.login_view = 'auth.login'
 
     app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'uploads', 'videos')
+    app.config['THUMBNAIL_FOLDER'] = os.path.join(app.root_path, 'uploads', 'thumbnail')
     app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
 
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok = True)
+    os.makedirs(app.config['THUMBNAIL_FOLDER'], exist_ok = True)
 
     app.register_blueprint(main_bp)
     app.register_blueprint(upload_bp, url_prefix = '/upload')

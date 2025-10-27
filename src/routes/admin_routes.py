@@ -15,6 +15,7 @@ def admin_required(func):
         return func(*args, **kwargs)
     return view
 
+# Contadores principales del dashboard administrador
 @admin_bp.route('/admin-dashboard')
 @login_required
 @admin_required
@@ -41,7 +42,7 @@ def admin_dashboard():
     cursor.close()
     return render_template('admin/admin_dashboard.html', total_users = total_users, total_admins = total_admins, total_archivos = total_archivos, idiomas = idiomas)
 
-# Apartado para visualizar todos los usuarios registrados en el sistema
+# Visualización de todos los usuarios registrados en el sistema
 @admin_bp.route('/view-users')
 @login_required
 @admin_required

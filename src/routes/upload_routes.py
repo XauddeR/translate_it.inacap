@@ -1,10 +1,12 @@
 import os 
+import uuid
 from flask import Blueprint, request, redirect, url_for, flash, render_template, current_app
+from moviepy import VideoFileClip
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from services.deepl_api import translate_text
 from services.transcription import audio_transcription
-from utils.video_proccess import audio_extract, convert_mp4
+from utils.video_proccess import audio_extract, convert_mp4, create_thumbnail
 from utils.extensions import mysql
 from pathlib import Path
 
@@ -30,40 +32,47 @@ def upload_file():
             return redirect(request.url)
 
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            temp_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            unique_id = str(uuid.uuid4())
+            original_filename = secure_filename(file.filename)
+            extension = Path(original_filename).suffix
+
+            unique_filename = f'{unique_id}{extension}'
+            temp_path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_filename)
             file.save(temp_path)
 
             final_path = convert_mp4(temp_path)
-
             if final_path != temp_path and os.path.exists(temp_path):
                 os.remove(temp_path)
 
-            filename = Path(final_path).name
-
             try:
                 rel = Path(final_path).relative_to(current_app.root_path)
-                db_ruta_video = rel.as_posix()
+                db_video_path = rel.as_posix()
             except Exception:
-                db_ruta_video = Path(final_path).as_posix()
+                db_video_path = Path(final_path).as_posix()
 
             audio_path = audio_extract(final_path)
-            db_ruta_audio = Path(audio_path).as_posix()
+            db_audio_path = Path(audio_path).as_posix()
+
             transcription = audio_transcription(audio_path)
             translation = translate_text(transcription, language.upper())
+
+            thumbnail_name = f'{unique_id}.jpg'
+            db_thumbnail = create_thumbnail(video_path = final_path, thumbnail_filename = thumbnail_name, thumbnail_folder = current_app.config['THUMBNAIL_FOLDER'])
 
             try:
                 cursor = mysql.connection.cursor()
                 cursor.execute(
                     '''
-                    INSERT INTO archivos (usuario_id, filename, ruta_video, ruta_audio, transcripcion, traduccion, idioma_destino)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO archivos (id, usuario_id, filename, miniatura_archivo, ruta_video, ruta_audio, transcripcion, traduccion, idioma_destino)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ''',
                     (
+                        unique_id,
                         current_user.id, 
-                        filename, 
-                        db_ruta_video, 
-                        db_ruta_audio, 
+                        original_filename,
+                        db_thumbnail,
+                        db_video_path, 
+                        db_audio_path, 
                         transcription, 
                         translation, 
                         language
