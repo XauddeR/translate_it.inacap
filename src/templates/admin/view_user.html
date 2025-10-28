@@ -61,7 +61,7 @@
           </li>
 
           <li>
-            <a href="#" class="flex items-center space-x-3 py-2 px-3 rounded-md transition text-slate-600 hover:bg-blue-50 hover:text-blue-700">
+            <a href="{{ url_for('admin.support_list') }}" class="flex items-center space-x-3 py-2 px-3 rounded-md transition text-slate-600 hover:bg-blue-50 hover:text-blue-700">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -123,12 +123,12 @@
           <tbody>
             {% for u in users %}
             <tr class="border-b border-slate-200 hover:bg-slate-50">
-              <td class="py-3 px-5 text-sm text-slate-700">{{ u.ID }}</td>
-              <td class="py-3 px-5 text-sm text-slate-700">{{ u.USUARIO }}</td>
-              <td class="py-3 px-5 text-sm text-slate-700">{{ u.EMAIL }}</td>
+              <td class="py-3 px-5 text-sm text-slate-700">{{ u.id }}</td>
+              <td class="py-3 px-5 text-sm text-slate-700">{{ u.usuario }}</td>
+              <td class="py-3 px-5 text-sm text-slate-700">{{ u.email }}</td>
               <td class="py-3 px-5">
                 <div class="flex space-x-1">
-                  <a href="{{ url_for('admin.update_user', user_id=u.ID) }}" 
+                  <a href="{{ url_for('admin.update_user', user_id = u.id) }}" 
                      title="Editar"
                      class="p-2 rounded-lg text-slate-500 transition-colors duration-150 hover:bg-yellow-50 hover:text-yellow-600">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -142,7 +142,7 @@
                     </svg>
                   </a>
 
-                  <a href="{{ url_for('admin.delete_user', user_id=u.ID) }}" 
+                  <a href="{{ url_for('admin.delete_user', user_id = u.id) }}" 
                      title="Eliminar"
                      class="p-2 rounded-lg text-slate-500 transition-colors duration-150 hover:bg-red-50 hover:text-red-600"
                      onclick="return confirm('¿Seguro que deseas eliminar este usuario?')">

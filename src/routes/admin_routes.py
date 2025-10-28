@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
-from MySQLdb.cursors import DictCursor
 from werkzeug.security import generate_password_hash
 from functools import wraps
 from utils.extensions import mysql
@@ -20,20 +19,20 @@ def admin_required(func):
 @login_required
 @admin_required
 def admin_dashboard():
-    cursor = mysql.connection.cursor(DictCursor)
+    cursor = mysql.connection.cursor()
 
-    cursor.execute('SELECT COUNT(*) AS TOTAL_USUARIOS FROM USUARIOS')
+    cursor.execute('SELECT COUNT(*) AS TOTAL_USUARIOS FROM usuarios')
     total_users = cursor.fetchone()['TOTAL_USUARIOS']
 
     cursor.execute('SELECT COUNT(*) AS TOTAL_ADMINS FROM administradores')
     total_admins = cursor.fetchone()['TOTAL_ADMINS']
     
-    cursor.execute('SELECT COUNT(*) AS TOTAL_ARCHIVOS FROM ARCHIVOS')
+    cursor.execute('SELECT COUNT(*) AS TOTAL_ARCHIVOS FROM archivos')
     total_archivos = cursor.fetchone()['TOTAL_ARCHIVOS']
 
     cursor.execute('''
         SELECT idioma_destino, COUNT(*) as cantidad 
-        FROM ARCHIVOS 
+        FROM archivos 
         GROUP BY idioma_destino 
         ORDER BY cantidad DESC 
         LIMIT 5
@@ -47,8 +46,8 @@ def admin_dashboard():
 @login_required
 @admin_required
 def view_users():
-    cursor = mysql.connection.cursor(DictCursor)
-    cursor.execute('SELECT ID, USUARIO, EMAIL FROM USUARIOS ORDER BY FECHA_REGISTRO ASC')
+    cursor = mysql.connection.cursor()
+    cursor.execute('SELECT id, usuario, email FROM usuarios ORDER BY fecha_registro ASC')
     users = cursor.fetchall()
     cursor.close()
     return render_template('admin/view_user.html', users = users)
@@ -58,8 +57,8 @@ def view_users():
 @login_required
 @admin_required
 def delete_user(user_id):
-    cursor = mysql.connection.cursor(DictCursor)
-    cursor.execute('DELETE FROM USUARIOS WHERE ID = %s', (user_id,))
+    cursor = mysql.connection.cursor()
+    cursor.execute('DELETE FROM usuarios WHERE id = %s', (user_id,))
     mysql.connection.commit()
     cursor.close()
     flash('Usuario eliminado correctamente', 'delete_success')
@@ -70,17 +69,17 @@ def delete_user(user_id):
 @login_required
 @admin_required
 def update_user(user_id):
-    cursor = mysql.connection.cursor(DictCursor)
+    cursor = mysql.connection.cursor()
     if request.method == 'POST':
         user = request.form['usuario']
         email = request.form['email']
-        cursor.execute('UPDATE USUARIOS SET USUARIO = %s, EMAIL = %s WHERE ID = %s', (user, email, user_id))
+        cursor.execute('UPDATE usuarios SET usuario = %s, email = %s WHERE id = %s', (user, email, user_id))
         mysql.connection.commit()
         cursor.close()
         flash('Usuario actualizado correctamente', 'update_success')
         return redirect(url_for('admin.view_users'))
     else:
-        cursor.execute('SELECT ID, USUARIO, EMAIL FROM USUARIOS WHERE ID = %s', (user_id,))
+        cursor.execute('SELECT id, usuario, email FROM usuarios WHERE id = %s', (user_id,))
         user = cursor.fetchone()
         cursor.close()
         return render_template('admin/update_user.html', user = user)
@@ -122,4 +121,146 @@ def add_user():
 
     return redirect(url_for('admin.view_users'))
 
+@admin_bp.route('/support')
+@login_required
+@admin_required
+def support_list():
+    estado = request.args.get('estado', '').strip().lower()
+    q = request.args.get('q', '').strip()
 
+    where = []
+    params = []
+
+    if estado:
+        where.append("t.estado = %s")
+        params.append(estado)
+
+    if q:
+        where.append("(t.asunto LIKE %s OR u.usuario LIKE %s OR u.email LIKE %s)")
+        like = f"%{q}%"
+        params.extend([like, like, like])
+
+    where_sql = ("WHERE " + " AND ".join(where)) if where else ""
+
+    sql = f"""
+        SELECT
+            t.id, t.asunto, t.estado, t.creado_en, t.actualizado_en,
+            u.id AS usuario_id, u.usuario, u.email
+        FROM tickets t
+        JOIN usuarios u ON u.id = t.usuario_id
+        {where_sql}
+        ORDER BY COALESCE(t.actualizado_en, t.creado_en) DESC
+    """
+
+    cur = mysql.connection.cursor()
+    cur.execute(sql, params)
+    tickets = cur.fetchall()
+    cur.close()
+
+    return render_template('admin/support_list.html', tickets = tickets, estado = estado, q=q)
+
+@admin_bp.route('/support/<int:ticket_id>')
+@login_required
+@admin_required
+def support_ticket_detail(ticket_id):
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+        SELECT t.id, t.usuario_id, t.asunto, t.estado, t.creado_en, t.actualizado_en,
+               u.usuario AS usuario_nombre, u.email AS usuario_email
+        FROM tickets t
+        JOIN usuarios u ON u.id = t.usuario_id
+        WHERE t.id = %s
+        LIMIT 1
+    """, (ticket_id,))
+    ticket = cur.fetchone()
+    if not ticket:
+        cur.close()
+        flash("El ticket no existe.", "error")
+        return redirect(url_for('admin.support_list'))
+
+    cur.execute("""
+        SELECT id, ticket_id, autor_usuario_id, autor_admin_id, mensaje, creado_en
+        FROM ticket_mensajes
+        WHERE ticket_id = %s
+        ORDER BY creado_en ASC
+    """, (ticket_id,))
+    mensajes = cur.fetchall()
+    cur.close()
+
+    return render_template('admin/support_ticket.html', ticket = ticket, mensajes = mensajes)
+
+@admin_bp.post('/support/tickets/<int:ticket_id>/reply', endpoint='support_ticket_reply')
+@admin_required
+def support_ticket_reply(ticket_id):
+    mensaje = (request.form.get('message') or '').strip()
+    if not mensaje:
+        flash('El mensaje no puede estar vacío.', 'error')
+        return redirect(url_for('admin.support_ticket_detail', ticket_id=ticket_id))
+
+    cur = mysql.connection.cursor()
+
+    # 0) Verificar ticket existe (opcional pero sano)
+    cur.execute("SELECT id, estado FROM tickets WHERE id = %s", (ticket_id,))
+    tk = cur.fetchone()
+    if not tk:
+        cur.close()
+        abort(404)
+
+    # 1) Obtener el ID REAL del admin en la tabla administradores
+    cur.execute("SELECT id FROM administradores WHERE usuario_id = %s", (current_user.id,))
+    admin = cur.fetchone()
+    if not admin:
+        cur.close()
+        abort(403)  # el usuario no figura como admin en la tabla administradores
+
+    admin_id = admin['id']
+
+    # 2) Insertar mensaje (autor_usuario_id debe ir NULL)
+    cur.execute("""
+        INSERT INTO ticket_mensajes (ticket_id, autor_usuario_id, autor_admin_id, mensaje)
+        VALUES (%s, %s, %s, %s)
+    """, (ticket_id, None, admin_id, mensaje))
+
+    # 3) Actualizar estado/fecha del ticket si lo deseas
+    cur.execute("""
+        UPDATE tickets
+        SET actualizado_en = NOW(),
+            estado = CASE WHEN estado = 'abierto' THEN 'pendiente' ELSE estado END
+        WHERE id = %s
+    """, (ticket_id,))
+
+    mysql.connection.commit()
+    cur.close()
+
+    flash('Respuesta enviada.', 'success')
+    return redirect(url_for('admin.support_ticket_detail', ticket_id=ticket_id))
+
+@admin_bp.post('/support/tickets/<int:ticket_id>/status', endpoint = 'support_ticket_set_status')
+@admin_required
+def support_ticket_set_status(ticket_id):
+    estado = (request.form.get('estado') or '').strip().lower()
+    permitidos = {'abierto', 'pendiente', 'resuelto', 'cerrado'}
+    if estado not in permitidos:
+        flash('Estado inválido.', 'error')
+        return redirect(url_for('admin.support_ticket_detail', ticket_id = ticket_id))
+
+    cur = mysql.connection.cursor()
+
+    cur.execute("SELECT id FROM tickets WHERE id = %s", (ticket_id,))
+    if not cur.fetchone():
+        cur.close()
+        abort(404)
+
+    cur.execute("""
+        UPDATE tickets
+        SET estado = %s,
+            actualizado_en = NOW()
+        WHERE id = %s
+    """, (estado, ticket_id))
+
+    mysql.connection.commit()
+    cur.close()
+
+    flash(f"Estado actualizado a {estado}.", "success")
+    return redirect(url_for('admin.support_ticket_detail', ticket_id=ticket_id))

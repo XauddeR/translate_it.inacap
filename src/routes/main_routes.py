@@ -1,7 +1,6 @@
 import os
 from flask import Blueprint, render_template, abort, send_from_directory, flash, redirect, url_for, send_file, request, current_app
 from werkzeug.utils import secure_filename
-from MySQLdb.cursors import DictCursor
 from flask_login import current_user, login_required
 from utils.extensions import mysql
 from io import BytesIO
@@ -12,11 +11,6 @@ main_bp = Blueprint('main', __name__)
 def index():
     return render_template('index.html')
 
-@main_bp.route('/support')
-@login_required
-def support():
-    return render_template('support.html', user = current_user)
-
 @main_bp.route('/dashboard')
 @login_required
 def dashboard():
@@ -25,7 +19,7 @@ def dashboard():
 @main_bp.route('/historial')
 @login_required
 def history():
-    cursor = mysql.connection.cursor(DictCursor)
+    cursor = mysql.connection.cursor()
     cursor.execute('SELECT * FROM ARCHIVOS WHERE USUARIO_ID = %s ORDER BY FECHA_SUBIDA DESC', (current_user.id,))
     archivos = cursor.fetchall()
     cursor.close()
@@ -35,7 +29,7 @@ def history():
 @main_bp.route('/archivo/<archivo_id>')
 @login_required
 def file_detail(archivo_id):
-    cursor = mysql.connection.cursor(DictCursor)
+    cursor = mysql.connection.cursor()
     cursor.execute('SELECT * FROM ARCHIVOS WHERE id = %s', (archivo_id,))
     archivo = cursor.fetchone()
     cursor.close()
@@ -107,7 +101,7 @@ def delete_file(archivo_id):
 @main_bp.route('/download/<archivo_id>')
 @login_required
 def download(archivo_id):
-    cursor = mysql.connection.cursor(DictCursor)
+    cursor = mysql.connection.cursor()
     cursor.execute(
         '''
         SELECT traduccion, nombre_archivo, filename, usuario_id FROM archivos WHERE id = %s

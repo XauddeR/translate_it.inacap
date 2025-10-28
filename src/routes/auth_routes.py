@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required
 from werkzeug.security import check_password_hash
-from MySQLdb.cursors import DictCursor
 from models.user_model import create_user, User
 from utils.extensions import mysql
 
@@ -12,7 +11,7 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        cursor = mysql.connection.cursor(DictCursor)
+        cursor = mysql.connection.cursor()
         cursor.execute('SELECT * FROM USUARIOS WHERE EMAIL = %s', (email,))
         user = cursor.fetchone()
         cursor.close()

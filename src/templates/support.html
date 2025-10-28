@@ -23,12 +23,11 @@
   </header>
 
   <div class="flex flex-1">
-    
     <aside class="w-64 bg-white border-r border-slate-200 flex flex-col">
       <nav class="flex-1 px-4 py-6">
         <ul class="space-y-2 text-sm">
           <li>
-            <a href="{{ url_for('main.dashboard') }}" 
+            <a href="{{ url_for('main.dashboard') }}"
                class="flex items-center space-x-3 py-2 px-3 rounded-md transition text-slate-600 hover:bg-blue-50 hover:text-blue-700">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h12A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6zM3.75 12H6m1.5 0h.008m.007 0H9m.75 0h.008m.007 0h.75m3 0h.008m.007 0h.75m1.5 0h.008m.007 0H18m-9 3.75h.008m.007 0h.75m1.5 0h.008m.007 0h.75m-3-7.5h.008m.007 0h.75m1.5 0h.008m.007 0h.75" />
@@ -45,7 +44,8 @@
             </a>
           </li>
           <li>
-            <a href="{{ url_for('main.support') }}" class="flex items-center space-x-3 py-2 px-3 rounded-md transition font-semibold bg-blue-50 text-blue-700">
+            <a href="{{ url_for('support.support_home') }}"
+               class="flex items-center space-x-3 py-2 px-3 rounded-md transition font-semibold bg-blue-50 text-blue-700">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
               </svg>
@@ -59,81 +59,135 @@
     <main id="mainContent" class="flex-1 p-10 bg-slate-50">
       <h1 class="text-4xl font-extrabold text-slate-900 mb-8">Centro de Soporte</h1>
 
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="mb-6 space-y-2" id="flash-container">
+            {% for category, message in messages %}
+              <div
+                class="js-flash px-4 py-3 rounded-lg border transition-opacity duration-300
+                       {% if category in ['error','danger'] %}bg-red-50 border-red-200 text-red-700
+                       {% elif category == 'success' %}bg-green-50 border-green-200 text-green-700
+                       {% else %}bg-slate-50 border-slate-200 text-slate-700{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
         <div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-lg border border-slate-200">
           <h2 class="text-2xl font-semibold text-slate-900 mb-6">Preguntas Frecuentes (FAQ)</h2>
-          
           <div class="space-y-4">
             <details class="border-b border-slate-200 pb-4">
               <summary class="cursor-pointer list-none font-semibold text-slate-700 hover:text-blue-600 flex justify-between items-center">
                 ¿Qué formatos de video son compatibles?
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 transition-transform duration-300 transform open:rotate-180">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform duration-300 transform open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                 </svg>
               </summary>
               <p class="mt-3 text-sm text-slate-600 leading-relaxed">
-                Actualmente, aceptamos los formatos de video más comunes, incluyendo **MP4, MOV, MKV, y AVI**. Si tienes un formato diferente, te recomendamos convertirlo a MP4 antes de subirlo.
+                Aceptamos <strong>MP4, MOV, MKV y AVI</strong>. Si tu formato es distinto, convértelo a MP4 antes de subirlo.
               </p>
             </details>
 
             <details class="border-b border-slate-200 pb-4">
               <summary class="cursor-pointer list-none font-semibold text-slate-700 hover:text-blue-600 flex justify-between items-center">
                 ¿Qué tan precisas son las traducciones?
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 transition-transform duration-300 transform open:rotate-180">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform duration-300 transform open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                 </svg>
               </summary>
               <p class="mt-3 text-sm text-slate-600 leading-relaxed">
-                Nuestra aplicación utiliza <span class="font-bold italic">Whisper de OpenAI</span> para la transcripción y <span class="font-bold italic">DeepL</span> para la traducción. Estas son dos de las tecnologías de IA más avanzadas del mercado, lo que garantiza una precisión muy alta, incluso con ruido de fondo o acentos.
+                Usamos <span class="font-bold italic">Whisper</span> para transcripción y <span class="font-bold italic">DeepL</span> para traducción.
               </p>
             </details>
 
             <details class="border-b border-slate-200 pb-4">
               <summary class="cursor-pointer list-none font-semibold text-slate-700 hover:text-blue-600 flex justify-between items-center">
                 ¿Puedo editar el nombre de mi archivo?
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 transition-transform duration-300 transform open:rotate-180">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform duration-300 transform open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                 </svg>
               </summary>
               <p class="mt-3 text-sm text-slate-600 leading-relaxed">
-                ¡Sí! En la página de **Historial de archivos**, puedes hacer clic en el ícono de editar (lápiz) al lado de cualquier archivo para cambiarle el nombre y organizarte mejor.
+                Sí. En <b>Historial</b> puedes renombrar cualquier archivo con el ícono de lápiz.
               </p>
             </details>
           </div>
         </div>
-        
+
         <div class="lg:col-span-1 bg-white p-8 rounded-xl shadow-lg border border-slate-200">
           <h2 class="text-2xl font-semibold text-slate-900 mb-6">¿Aún tienes dudas?</h2>
           <p class="text-sm text-slate-600 mb-6">
-            Envíanos un mensaje y nuestro equipo se pondrá en contacto contigo a la brevedad.
+            Envíanos un mensaje y te contactaremos a la brevedad.
           </p>
-          
-          <form action="#" method="POST" class="space-y-5">
+
+          <form action="{{ url_for('support.create_ticket') }}" method="POST" class="space-y-5">
             <div>
               <label for="subject" class="block text-sm font-medium text-slate-700 mb-1">Asunto</label>
-              <input type="text" id="subject" name="subject" required
+              <input type="text" id="subject" name="subject" required maxlength="150"
                      class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
             </div>
-            
+
             <div>
               <label for="message" class="block text-sm font-medium text-slate-700 mb-1">Tu Mensaje</label>
               <textarea id="message" name="message" rows="6" required
                         class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 resize-none"></textarea>
             </div>
-            
+
             <button type="submit"
                     class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-sm hover:bg-blue-700 transition-all duration-300
                            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 -ml-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 -ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.875L5.999 12zm0 0h7.5" />
               </svg>
               Enviar Mensaje
             </button>
           </form>
         </div>
-
       </div>
+
+      {% set estado_clases = {
+        'abierto': 'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-200',
+        'pendiente': 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200',
+        'resuelto': 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200',
+        'cerrado': 'bg-slate-100 text-slate-600 ring-1 ring-inset ring-slate-200'
+      } %}
+
+      {% if tickets and tickets|length > 0 %}
+      <section class="mt-8">
+        <div class="bg-white border border-slate-200 rounded-xl shadow-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-slate-900">Mis tickets</h2>
+            <a href="{{ url_for('support.support_home') }}" class="text-sm text-slate-500 hover:text-slate-700">Actualizar</a>
+          </div>
+
+          <div class="space-y-3">
+            {% for t in tickets %}
+            <a href="{{ url_for('support.view_ticket', ticket_id=t.id) }}"
+               class="block rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-sm transition p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <div class="font-medium text-slate-900 truncate">{{ t.asunto }}</div>
+                  <div class="text-xs text-slate-500 mt-1">
+                    {% if t.actualizado_en %}
+                      Actualizado: {{ t.actualizado_en }}
+                    {% else %}
+                      Creado: {{ t.creado_en }}
+                    {% endif %}
+                  </div>
+                </div>
+                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {{ estado_clases.get(t['estado']|lower, 'bg-slate-100 text-slate-600 ring-1 ring-inset ring-slate-200') }}">
+                  {{ t.estado|capitalize }}
+                </span>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+      {% endif %}
     </main>
   </div>
 
@@ -146,14 +200,23 @@
   <script>
     document.querySelectorAll('details').forEach((el) => {
       el.addEventListener('toggle', (e) => {
-        const icon = e.target.querySelector('svg');
-        if (e.target.open) {
-          icon.classList.add('rotate-180');
-        } else {
-          icon.classList.remove('rotate-180');
-        }
+        const icon = e.target.querySelector('summary svg');
+        if (!icon) return;
+        icon.classList.toggle('rotate-180', e.target.open);
       });
     });
+
+    (function () {
+      const flashes = document.querySelectorAll('.js-flash');
+      if (!flashes.length) return;
+
+      setTimeout(() => {
+        flashes.forEach(el => {
+          el.classList.add('opacity-0');
+          setTimeout(() => el.remove(), 320);
+        });
+      }, 5000);
+    })();
   </script>
 
 </body>

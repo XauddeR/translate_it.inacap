@@ -6,6 +6,7 @@ from routes.auth_routes import auth_bp
 from routes.main_routes import main_bp
 from routes.upload_routes import upload_bp
 from routes.admin_routes import admin_bp
+from routes.support_routes import support_bp
 from utils.extensions import mysql, login_manager
 
 def translateit():
@@ -24,24 +25,34 @@ def translateit():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok = True)
     os.makedirs(app.config['THUMBNAIL_FOLDER'], exist_ok = True)
 
+    app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(upload_bp, url_prefix = '/upload')
     app.register_blueprint(admin_bp, url_prefix = '/admin')
-    app.register_blueprint(auth_bp)
+    app.register_blueprint(support_bp, url_prefix = '/support')
 
     @login_manager.user_loader
     def load_user(user_id):
-        cursor = mysql.connection.cursor()
-        cursor.execute('SELECT * FROM USUARIOS WHERE ID = %s', (user_id,))
-        row = cursor.fetchone()
-        cursor.close()
-        if row:
-            return User.from_db({
-                'id': row[0],
-                'usuario': row[1],
-                'email': row[2]
-            })
-        return None
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            SELECT 
+                u.ID        AS id,
+                u.USUARIO   AS usuario,
+                u.EMAIL     AS email,
+                (a.usuario_id IS NOT NULL) AS is_admin
+            FROM usuarios u
+            LEFT JOIN administradores a ON a.usuario_id = u.ID
+            WHERE u.ID = %s
+            LIMIT 1
+        """, (user_id,))
+        row = cur.fetchone()
+        cur.close()
+        if not row:
+            return None
+        user = User.from_db(row)
+        if 'is_admin' in row:
+            user._is_admin = bool(row['is_admin'])
+        return user
 
     @app.errorhandler(404)
     def page_not_found(error):

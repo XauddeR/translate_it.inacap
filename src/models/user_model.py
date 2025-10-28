@@ -1,6 +1,5 @@
 from utils.extensions import mysql
 from werkzeug.security import generate_password_hash
-from MySQLdb.cursors import DictCursor
 from flask_login import UserMixin
 
 class User(UserMixin):
@@ -13,11 +12,10 @@ class User(UserMixin):
     @property
     def is_admin(self):
         if self._is_admin is None:
-            cursor = mysql.connection.cursor(DictCursor)
-            cursor.execute('SELECT 1 FROM ADMINISTRADORES WHERE USUARIO_ID = %s', (self.id,))
-            result = cursor.fetchone()
+            cursor = mysql.connection.cursor()
+            cursor.execute('SELECT 1 FROM administradores WHERE usuario_id = %s LIMIT 1', (self.id,))
+            self._is_admin = cursor.fetchone() is not None
             cursor.close()
-            self._is_admin = bool(result)
         return self._is_admin
 
     @staticmethod
