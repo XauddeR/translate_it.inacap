@@ -1,261 +1,163 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .flash-fade-out { opacity: 0; transition: opacity .5s ease-out; }
-    button[disabled] { opacity: 0.5; cursor: not-allowed; }
-  </style>
-  <title>Admin — Ticket #{{ ticket.id }}</title>
-</head>
+{% extends "base.html" %}
+{% block title %}Ticket #{{ ticket.id }} — Admin · Translate It{% endblock %}
 
-<body class="bg-slate-50 text-slate-800 min-h-screen font-sans antialiased flex flex-col">
-
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto flex items-center justify-between py-5 px-6">
-      <h1 class="text-3xl font-extrabold text-blue-600 tracking-tight">
-        <a href="{{ url_for('main.index') }}">Translate It</a>
-      </h1>
-      <nav class="space-x-6 text-sm font-medium flex items-center">
-        <a href="{{ url_for('main.index') }}" class="text-slate-600 hover:text-blue-600 transition">INICIO</a>
-        <a href="{{ url_for('auth.logout') }}" class="text-red-500 hover:text-red-600 font-medium">CERRAR SESIÓN</a>
-      </nav>
-    </div>
-  </header>
-
-  <div class="flex flex-1">
-    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col">
-      <nav class="flex-1 px-4 py-6">
-        <ul class="space-y-2 text-sm">
-          <li>
-            <a href="{{ url_for('admin.admin_dashboard') }}"
-               class="flex items-center space-x-3 py-2 px-3 rounded-md transition text-slate-600 hover:bg-blue-50 hover:text-blue-700">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h12A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6zM3.75 12H6m1.5 0h.008m.007 0H9m.75 0h.008m.007 0h.75m3 0h.008m.007 0h.75m1.5 0h.008m.007 0H18m-9 3.75h.008m.007 0h.75m1.5 0h.008m.007 0h.75m-3-7.5h.008m.007 0h.75m1.5 0h.008m.007 0h.75" />
-              </svg>
-              <span>Dashboard</span>
-            </a>
-          </li>
-          <li>
-            <a href="{{ url_for('admin.view_users') }}"
-               class="flex items-center space-x-3 py-2 px-3 rounded-md transition text-slate-600 hover:bg-blue-50 hover:text-blue-700">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM12 12.75c-1.84 0-3.375.636-3.375 1.406v.75h6.75v-.75c0-.77-.52-1.406-3.375-1.406z" />
-              </svg>
-              <span>USUARIOS REGISTRADOS</span>
-            </a>
-          </li>
-          <li>
-            <a href="{{ url_for('admin.support_list') }}"
-               class="flex items-center space-x-3 py-2 px-3 rounded-md transition font-semibold bg-blue-50 text-blue-700">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-              </svg>
-              <span>SOPORTE</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </aside>
-
-    <main id="mainContent" class="flex-1 p-10 bg-slate-50">
-
-      <a href="{{ url_for('admin.support_list') }}"
-         class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 mb-6 transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
-          <path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd" />
-        </svg>
-        Volver a la lista
-      </a>
-
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <div id="flashes" class="mb-6 space-y-2">
-            {% for c,m in messages %}
-              <div class="px-4 py-3 rounded-lg border text-sm
-                          {% if c in ['error','danger'] %}bg-red-50 border-red-200 text-red-700
-                          {% elif c == 'success' %}bg-green-50 border-green-200 text-green-700
-                          {% else %}bg-slate-50 border-slate-200 text-slate-700{% endif %}">
-                {{ m }}
-              </div>
-            {% endfor %}
-          </div>
-        {% endif %}
-      {% endwith %}
-
-      <div class="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        <div>
-          <h1 class="text-4xl font-extrabold text-slate-900">{{ ticket.asunto }}</h1>
-          <div class="mt-2 text-sm text-slate-600 space-y-1">
-            <p>Usuario: <b>{{ ticket.usuario_nombre }}</b> ({{ ticket.usuario_email }})</p>
-            <p>
-              Creado: {{ ticket.creado_en }}
-              {% if ticket.actualizado_en %}
-                <span class="text-slate-400">•</span> Actualizado: {{ ticket.actualizado_en }}
-              {% endif %}
-              <span class="text-slate-400">•</span> Estado: <b>{{ ticket.estado|capitalize }}</b>
-              <span class="text-slate-400">•</span>
-              <span class="font-mono text-xs">#{{ ticket.id }}</span>
-            </p>
-          </div>
-        </div>
-
-        <form action="{{ url_for('admin.support_ticket_set_status', ticket_id=ticket.id) }}"
-              method="post"
-              class="flex-shrink-0 flex flex-wrap gap-2">
-          {% if ticket.estado == 'cerrado' %}
-            <button name="estado" value="abierto" title="Reabrir Ticket"
-                    class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg shadow-sm border border-emerald-300 bg-white text-emerald-700 hover:bg-emerald-50 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 -ml-0.5">
-                <path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201-2.43l.17-.005a.75.75 0 01.764.722 4 4 0 007.65 1.093l-.417-.012a.75.75 0 01-.73-.815 5.492 5.492 0 01-.22 1.445zM4.688 8.576a5.5 5.5 0 019.201 2.43l-.17.005a.75.75 0 01-.764-.722 4 4 0 00-7.65-1.093l.417.012a.75.75 0 01.73.815 5.492 5.492 0 01.22-1.445z" clip-rule="evenodd" />
-                <path fill-rule="evenodd" d="M9.013 3.684a.75.75 0 01.755-.68l.17-.005A5.5 5.5 0 0115.312 8.576l-.04.18a.75.75 0 01-.726.569l-.178-.004a4 4 0 00-3.676-3.676l-.004-.178a.75.75 0 01.57-.726zM10.987 16.316a.75.75 0 01-.755.68l-.17.005A5.5 5.5 0 014.688 11.424l.04-.18a.75.75 0 01.726-.569l.178.004a4 4 0 003.676 3.676l.004.178a.75.75 0 01-.57.726z" clip-rule="evenodd" />
-              </svg>
-              Reabrir
-            </button>
-          {% else %}
-            <button name="estado" value="cerrado" title="Cerrar Ticket"
-                    class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg shadow-sm border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 -ml-0.5">
-                <path d="M10 2a.75.75 0 01.75.75v7.5a.75.75 0 01-1.5 0v-7.5A.75.75 0 0110 2zM5.106 5.106a.75.75 0 010 1.06l-2.02 2.02a.75.75 0 11-1.06-1.06l2.02-2.02a.75.75 0 011.06 0zm11.812 1.06a.75.75 0 010-1.06l2.02-2.02a.75.75 0 011.06 1.06l-2.02 2.02a.75.75 0 01-1.06 0zM10 12.5a.75.75 0 01.75.75v3a.75.75 0 01-1.5 0v-3A.75.75 0 0110 12.5zM3.086 12.147a.75.75 0 011.06 0l2.02 2.02a.75.75 0 11-1.06 1.06l-2.02-2.02a.75.75 0 010-1.06zm14.874 1.06a.75.75 0 01-1.06 0l-2.02 2.02a.75.75 0 01-1.06-1.06l2.02-2.02a.75.75 0 011.06 0z" />
-              </svg>
-              Cerrar
-            </button>
-          {% endif %}
-
-          <button name="estado" value="resuelto" title="Marcar como Resuelto"
-                  {% if ticket.estado == 'resuelto' %}disabled{% endif %}
-                  class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg shadow-sm border border-blue-300 bg-white text-blue-700 hover:bg-blue-50 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 -ml-0.5">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
-            </svg>
-            Resuelto
-          </button>
-
-          <button name="estado" value="pendiente" title="Marcar como Pendiente"
-                  {% if ticket.estado == 'pendiente' %}disabled{% endif %}
-                  class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg shadow-sm border border-amber-300 bg-white text-amber-700 hover:bg-amber-50 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 -ml-0.5">
-              <path fill-rule="evenodd" d="M2 10a8 8 0 1116 0 8 8 0 01-16 0zm8-5.25A.75.75 0 0110.75 5v5a.75.75 0 01-1.5 0V5A.75.75 0 0110 4.75zM8 15a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-            </svg>
-            Pendiente
-          </button>
-        </form>
-      </div>
-
-      <section class="bg-white border border-slate-200 rounded-xl shadow-lg p-6">
-        <h2 class="text-xl font-semibold text-slate-900 mb-4">Conversación</h2>
-        <div class="space-y-6">
-          {% if mensajes and mensajes|length > 0 %}
-            {% for m in mensajes %}
-              {% set es_usuario = m.autor_usuario_id is not none %}
-              <div class="flex {{ 'justify-start' if es_usuario else 'justify-end' }}">
-                <div class="max-w-[85%]">
-                  <div class="flex items-center gap-2 text-xs mb-1.5 {{ 'justify-start' if es_usuario else 'justify-end' }}">
-                    {% if es_usuario %}
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-slate-400">
-                        <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
-                      </svg>
-                      <span class="font-medium text-slate-600">{{ ticket.usuario_nombre }}</span>
-                    {% else %}
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-slate-400">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0c0 .993-.241 1.929-.668 2.754l-1.524-1.525a3.997 3.997 0 00.078-2.183l1.562-1.562C15.802 8.249 16 9.1 16 10zm-5.165 3.913l1.58 1.58A5.96 5.96 0 0110 16a5.96 5.96 0 01-2.415-.507l1.58-1.58a4 4 0 002.83 0zM10 4a5.96 5.96 0 012.415.507l-1.58 1.58a4 4 0 00-2.83 0L6.085 4.507A5.96 5.96 0 0110 4zM4 10c0-.9.198-1.751.535-2.546l1.562 1.562a3.997 3.997 0 00-.078 2.183l-1.524 1.525C4.24 11.929 4 10.993 4 10z" clip-rule="evenodd" />
-                      </svg>
-                      <span class="font-medium text-slate-600">Soporte</span>
-                    {% endif %}
-                    <span class="text-slate-400">• {{ m.creado_en }}</span>
-                  </div>
-                  <div class="whitespace-pre-wrap rounded-xl text-sm px-4 py-3 border
-                              {{ 'bg-slate-50 border-slate-200 text-slate-800' if es_usuario else 'bg-blue-50 border-blue-200 text-slate-800' }}">
-                    {{ m.mensaje }}
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          {% else %}
-            <p class="text-sm text-center text-slate-500 py-4">No hay mensajes.</p>
-          {% endif %}
-        </div>
-      </section>
-
-      {% if ticket.estado != 'cerrado' %}
-        <section class="mt-6 bg-white border border-slate-200 rounded-xl shadow-lg p-6">
-          <h3 class="text-lg font-semibold text-slate-900 mb-4">Responder como soporte</h3>
-          <form method="post"
-                action="{{ url_for('admin.support_ticket_reply', ticket_id=ticket.id) }}"
-                class="space-y-4"
-                id="replyForm">
-            <div>
-              <label for="message" class="sr-only">Tu mensaje</label>
-              <textarea id="message" name="message" rows="5" required
-                        placeholder="Escribe tu respuesta aquí..."
-                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y text-sm"></textarea>
-            </div>
-            <div class="flex justify-end">
-              <button id="replyBtn" type="submit"
-                      class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-sm hover:bg-blue-700 transition duration-150
-                             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                             disabled:opacity-60 disabled:cursor-not-allowed">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 -ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.875L5.999 12zm0 0h7.5" />
-                </svg>
-                <span id="replyBtnText">Enviar Respuesta</span>
-              </button>
-            </div>
-          </form>
-        </section>
-      {% else %}
-        <section class="mt-6 bg-white border border-slate-200 rounded-xl shadow-lg p-6">
-          <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg p-4">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 flex-shrink-0">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
-            </svg>
-            <p class="text-sm">
-              Este ticket está <strong>cerrado</strong>. Puedes
-              <button type="submit" form="reopenForm" class="font-medium hover:underline">reabrirlo</button>
-              si necesitas continuar la conversación.
-            </p>
-            <form id="reopenForm"
-                  action="{{ url_for('admin.support_ticket_set_status', ticket_id=ticket.id) }}"
-                  method="post"
-                  class="hidden">
-              <input type="hidden" name="estado" value="abierto" />
-            </form>
-          </div>
-        </section>
-      {% endif %}
-    </main>
+{% block content %}
+<section class="relative">
+  <div class="absolute inset-0 -z-10">
+    <div class="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] rounded-full blur-3xl opacity-30"
+         style="background: radial-gradient(closest-side, rgba(59,130,246,.35), rgba(29,78,216,.25), transparent 70%);"></div>
   </div>
 
-  <footer class="bg-slate-100 border-t border-slate-200 py-8">
-    <div class="max-w-7xl mx-auto text-center">
-      <p class="text-sm text-slate-500">&copy; 2025 Translate It. Todos los derechos reservados.</p>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-14">
+    <div class="flex items-center justify-between gap-4 mb-6">
+      <div>
+        <a href="{{ url_for('admin.support_list') }}" class="inline-flex items-center gap-1 text-sm text-brand-300 hover:text-brand-200 mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Volver
+        </a>
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">{{ ticket.asunto }}</h1>
+        <p class="text-slate-300 mt-1">
+          Ticket #{{ ticket.id }} — <span class="text-slate-400">{{ ticket.usuario_nombre }}</span> ({{ ticket.usuario_email }})
+        </p>
+      </div>
     </div>
-  </footer>
 
-  <script>
-    (function () {
-      const box = document.getElementById('flashes');
-      if (!box) return;
-      setTimeout(() => {
-        box.querySelectorAll('div').forEach(flash => {
-          flash.classList.add('flash-fade-out');
-          setTimeout(() => flash.remove(), 500);
-        });
-      }, 5000);
-    })();
+    <div class="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
+      <aside class="md:sticky md:top-24 md:self-start rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 md:p-5 hidden md:block">
+        <nav>
+          <ul class="space-y-1 text-sm">
+            <li>
+              <a href="{{ url_for('admin.admin_dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:ring-1 hover:ring-white/10 text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17"/></svg>
+                Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('admin.view_users') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:ring-1 hover:ring-white/10 text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM12 12.75c-1.84 0-3.375.636-3.375 1.406v.75h6.75v-.75c0-.77-.52-1.406-3.375-1.406zM15 19.128v.106A12.318 12.318 0 018.624 21 12.319 12.319 0 012.25 19.235a6.375 6.375 0 0111.964-3.07"/></svg>
+                Usuarios
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('admin.support_list') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-brand-600/20 text-brand-200 ring-1 ring-brand-500/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.88 7.52c1.17-1.02 3.07-1.02 4.24 0 1.17 1.02 1.17 2.69 0 3.71-.2.18-.43.33-.67.44-.75.36-1.45 1-1.45 1.83v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/>
+                </svg>
+                Soporte
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
 
-    (function () {
-      const form = document.getElementById('replyForm');
-      const btn = document.getElementById('replyBtn');
-      const btnText = document.getElementById('replyBtnText');
-      if (!form || !btn || !btnText) return;
-      form.addEventListener('submit', () => {
-        btn.disabled = true;
-        btnText.textContent = 'Enviando…';
-      });
-    })();
-  </script>
-</body>
-</html>
+      <main class="space-y-6">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div id="flashes" class="space-y-2">
+              {% for c, m in messages %}
+                <div class="flash-message rounded-xl px-4 py-3 text-sm
+                            {% if c in ['error','danger'] %} bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30
+                            {% elif c == 'success' %} bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30
+                            {% else %} bg-white/5 text-slate-200 ring-1 ring-white/10 {% endif %}">
+                  {{ m }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-5 flex flex-wrap gap-3 justify-between items-start">
+          <div>
+            <p class="text-sm text-slate-300">
+              Estado actual:
+              <span class="font-medium">{{ ticket.estado|capitalize }}</span>
+            </p>
+            <p class="text-xs text-slate-400 mt-1">
+              Creado: {{ ticket.creado_en }}{% if ticket.actualizado_en %} · Actualizado: {{ ticket.actualizado_en }}{% endif %}
+            </p>
+          </div>
+          <form action="{{ url_for('admin.support_ticket_set_status', ticket_id=ticket.id) }}" method="post" class="flex flex-wrap gap-2">
+            <button name="estado" value="pendiente" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-900/30 text-amber-200 ring-1 ring-amber-500/30 hover:bg-amber-900/40 transition {% if ticket.estado=='pendiente' %}opacity-50 cursor-not-allowed{% endif %}" {% if ticket.estado=='pendiente' %}disabled{% endif %}>Pendiente</button>
+            <button name="estado" value="resuelto" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30 hover:bg-emerald-900/40 transition {% if ticket.estado=='resuelto' %}opacity-50 cursor-not-allowed{% endif %}" {% if ticket.estado=='resuelto' %}disabled{% endif %}>Resuelto</button>
+            <button name="estado" value="cerrado" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 ring-1 ring-white/10 hover:bg-slate-700/60 transition {% if ticket.estado=='cerrado' %}opacity-50 cursor-not-allowed{% endif %}" {% if ticket.estado=='cerrado' %}disabled{% endif %}>Cerrar</button>
+          </form>
+        </div>
+
+        <section class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-5">
+          <h2 class="sr-only">Conversación</h2>
+          <div class="space-y-5">
+            {% if mensajes %}
+              {% for m in mensajes %}
+                {% set es_usuario = m.autor_usuario_id is not none %}
+                <div class="flex {{ 'justify-start' if es_usuario else 'justify-end' }}">
+                  <div class="max-w-[80%] break-words">
+                    <div class="flex items-center gap-2 text-xs mb-1 {{ 'justify-start' if es_usuario else 'justify-end' }}">
+                      <span class="text-slate-400">{{ m.creado_en }}</span>
+                    </div>
+                    <div class="whitespace-pre-wrap px-4 py-2.5 rounded-2xl text-sm leading-snug {{ 'bg-slate-900/60 text-slate-100 ring-1 ring-white/10' if es_usuario else 'bg-brand-900/30 text-slate-100 ring-1 ring-brand-500/30' }}">{{ m.mensaje }}</div>
+                  </div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p class="text-sm text-center text-slate-400 py-4">No hay mensajes en este ticket.</p>
+            {% endif %}
+          </div>
+        </section>
+
+        {% if ticket.estado != 'cerrado' %}
+          <!-- Respuesta -->
+          <section class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-5">
+            <h3 class="text-lg font-semibold text-slate-100 mb-3">Responder como soporte</h3>
+            <form action="{{ url_for('admin.support_ticket_reply', ticket_id=ticket.id) }}" method="post" id="replyForm" class="space-y-4">
+              <textarea id="message" name="message" rows="5" required
+                        placeholder="Escribe tu respuesta aquí…"
+                        class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 resize-y text-sm"></textarea>
+              <div class="flex justify-end">
+                <button id="replyBtn" type="submit"
+                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-semibold shadow-glow disabled:opacity-60 disabled:cursor-not-allowed">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.27 3.13A59.77 59.77 0 0121.48 12a59.77 59.77 0 01-18.21 8.87L6 12zm0 0h7.5"/>
+                  </svg>
+                  <span id="replyBtnText">Enviar</span>
+                </button>
+              </div>
+            </form>
+          </section>
+        {% else %}
+          <section class="rounded-2xl bg-emerald-900/20 ring-1 ring-emerald-500/30 p-5 text-emerald-200">
+            <div class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75" />
+              </svg>
+              <p class="text-sm">Este ticket está <strong>{{ ticket.estado }}</strong>. Si necesitas reabrirlo, puedes cambiar su estado arriba.</p>
+            </div>
+          </section>
+        {% endif %}
+      </main>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  setTimeout(() => {
+    document.querySelectorAll('.flash-message').forEach(el => {
+      el.classList.add('opacity-0','transition','duration-700');
+      setTimeout(() => el.remove(), 700);
+    });
+  }, 5000);
+  (function () {
+    const form = document.getElementById('replyForm');
+    const btn = document.getElementById('replyBtn');
+    const btnText = document.getElementById('replyBtnText');
+    if (!form || !btn || !btnText) return;
+    form.addEventListener('submit', () => {
+      btn.disabled = true;
+      btnText.textContent = 'Enviando…';
+    });
+  })();
+</script>
+{% endblock %}

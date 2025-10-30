@@ -1,36 +1,92 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <title>Registro</title>
-</head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <form method="POST" class="bg-white p-8 rounded-lg shadow-md w-96 space-y-6">
-    <h1 class="text-2xl font-bold text-center text-blue-600">Crear cuenta</h1>
-    
-    <div>
-      <label class="block mb-2 text-sm font-medium text-gray-700">Nombre de usuario</label>
-      <input type="text" name="usuario" required
-        class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
+{% extends "base.html" %}
+{% block title %}Crear cuenta — Translate It{% endblock %}
 
-    <div>
-      <label class="block mb-2 text-sm font-medium text-gray-700">Correo electrónico</label>
-      <input type="email" name="email" required
-        class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
+{% block content %}
+<section class="relative">
+  <!-- Fondo hero sutil para cohesión -->
+  <div class="absolute inset-0 -z-10">
+    <img
+      src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=2000&q=80"
+      alt="" class="h-full w-full object-cover opacity-10" />
+    <div class="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-950/70 to-slate-950"></div>
+  </div>
 
-    <div>
-      <label class="block mb-2 text-sm font-medium text-gray-700">Contraseña</label>
-      <input type="password" name="password" required
-        class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+    <div class="mx-auto max-w-md">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-extrabold tracking-tight">Crear cuenta</h1>
+        <p class="mt-2 text-slate-300">Regístrate para empezar a transcribir y traducir con IA.</p>
+      </div>
 
-    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition">
-      Registrarse
-    </button>
-  </form>
-</body>
-</html>
+      <!-- Flash -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="mb-4 space-y-2">
+            {% for category, message in messages %}
+              <div class="rounded-xl px-4 py-3 text-sm
+                          {% if category == 'error' %} bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30
+                          {% elif category == 'success' %} bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30
+                          {% else %} bg-white/5 text-slate-200 ring-1 ring-white/10 {% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 sm:p-8 space-y-5">
+        {{ form.hidden_tag() if form is defined }}
+        <div>
+          <label class="block mb-2 text-sm font-medium text-slate-200">Nombre de usuario</label>
+          <input type="text" name="usuario" required
+                 value="{{ request.form.usuario or '' }}"
+                 class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500" />
+          {% if errors and errors.get('usuario') %}
+            <p class="mt-2 text-xs text-rose-300">{{ errors.get('usuario')[0] }}</p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-slate-200">Correo electrónico</label>
+          <input type="email" name="email" required
+                 value="{{ request.form.email or '' }}"
+                 class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500" />
+          {% if errors and errors.get('email') %}
+            <p class="mt-2 text-xs text-rose-300">{{ errors.get('email')[0] }}</p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-slate-200">Contraseña</label>
+          <div class="relative">
+            <input id="password" type="password" name="password" required
+                   class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 pr-10 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500" />
+          </div>
+          {% if errors and errors.get('password') %}
+            <p class="mt-2 text-xs text-rose-300">{{ errors.get('password')[0] }}</p>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-semibold py-2.5 shadow-glow">
+          Registrarse
+        </button>
+
+        <p class="text-center text-sm text-slate-300">
+          ¿Ya tienes cuenta?
+          <a href="{{ url_for('auth.login') }}" class="text-brand-300 hover:text-brand-200 font-medium">Inicia sesión</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const t = document.getElementById('togglePwd');
+  const p = document.getElementById('password');
+  t?.addEventListener('click', () => {
+    p.type = p.type === 'password' ? 'text' : 'password';
+  });
+</script>
+{% endblock %}

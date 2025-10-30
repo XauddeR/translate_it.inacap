@@ -1,196 +1,169 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .flash-fade-out { opacity: 0; transition: opacity .5s ease-out; }
-  </style>
-  <title>Translate It - Admin Soporte</title>
-</head>
+{% extends "base.html" %}
+{% block title %}Tickets de Soporte — Admin · Translate It{% endblock %}
 
-<body class="bg-slate-50 text-slate-800 min-h-screen font-sans antialiased flex flex-col">
+{% block content %}
+<section class="relative">
+  <div class="absolute inset-0 -z-10">
+    <div class="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] rounded-full blur-3xl opacity-30"
+         style="background: radial-gradient(closest-side, rgba(59,130,246,.35), rgba(29,78,216,.25), transparent 70%);"></div>
+  </div>
 
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto flex items-center justify-between py-5 px-6">
-      <h1 class="text-3xl font-extrabold text-blue-600 tracking-tight">
-        <a href="{{ url_for('main.index') }}">Translate It</a>
-      </h1>
-      <nav class="space-x-6 text-sm font-medium flex items-center">
-        <a href="{{ url_for('main.index') }}" class="text-slate-600 hover:text-blue-600 transition">INICIO</a>
-        <a href="{{ url_for('auth.logout') }}" class="text-red-500 hover:text-red-600 font-medium">CERRAR SESIÓN</a>
-      </nav>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-14">
+    <div class="flex items-center justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Tickets de Soporte</h1>
+        <p class="mt-1 text-slate-300">Administra y filtra las solicitudes de ayuda de los usuarios.</p>
+      </div>
     </div>
-  </header>
 
-  <div class="flex flex-1">
-    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col">
-      <nav class="flex-1 px-4 py-6">
-        <ul class="space-y-2 text-sm">
-          <li>
-            <a href="{{ url_for('admin.admin_dashboard') }}"
-               class="flex items-center space-x-3 py-2 px-3 rounded-md transition text-slate-600 hover:bg-blue-50 hover:text-blue-700">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h12A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6zM3.75 12H6m1.5 0h.008m.007 0H9m.75 0h.008m.007 0h.75m3 0h.008m.007 0h.75m1.5 0h.008m.007 0H18m-9 3.75h.008m.007 0h.75m1.5 0h.008m.007 0h.75m-3-7.5h.008m.007 0h.75m1.5 0h.008m.007 0h.75" />
+    <div class="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
+      <aside class="md:sticky md:top-24 md:self-start rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 md:p-5 md:block">
+        <nav>
+          <ul class="space-y-1 text-sm">
+            <li>
+              <a href="{{ url_for('admin.admin_dashboard') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:ring-1 hover:ring-white/10 text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17"/></svg>
+                Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('admin.view_users') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:ring-1 hover:ring-white/10 text-slate-300">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                <path d="M 12 4 A 4 4 0 1 1 12 12 A 4 4 0 1 1 12 4 Z M 4 20 C 4 15 8 13 12 13 C 16 13 20 15 20 20 Z" />
               </svg>
-              <span>Dashboard</span>
-            </a>
-          </li>
-          <li>
-            <a href="{{ url_for('admin.view_users') }}"
-               class="flex items-center space-x-3 py-2 px-3 rounded-md transition text-slate-600 hover:bg-blue-50 hover:text-blue-700">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM12 12.75c-1.84 0-3.375.636-3.375 1.406v.75h6.75v-.75c0-.77-.52-1.406-3.375-1.406z" />
-              </svg>
-              <span>USUARIOS REGISTRADOS</span>
-            </a>
-          </li>
-          <li>
-            <a href="{{ url_for('admin.support_list') }}"
-               class="flex items-center space-x-3 py-2 px-3 rounded-md transition font-semibold bg-blue-50 text-blue-700">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-              </svg>
-              <span>SOPORTE</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </aside>
+                Usuarios
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('admin.support_list') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg bg-brand-600/20 text-brand-200 ring-1 ring-brand-500/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9.88 7.52c1.17-1.02 3.07-1.02 4.24 0 1.17 1.02 1.17 2.69 0 3.71-.2.18-.43.33-.67.44-.75.36-1.45 1-1.45 1.83v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+                Soporte
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
 
-    <main id="mainContent" class="flex-1 p-10 bg-slate-50">
-      <h1 class="text-4xl font-extrabold text-slate-900 mb-8">Tickets de Soporte</h1>
-
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <div id="flashes" class="mb-6 space-y-2">
-            {% for c,m in messages %}
-              <div class="px-4 py-3 rounded-lg border text-sm
-                          {% if c in ['error','danger'] %}bg-red-50 border-red-200 text-red-700
-                          {% elif c == 'success' %}bg-green-50 border-green-200 text-green-700
-                          {% else %}bg-slate-50 border-slate-200 text-slate-700{% endif %}">
-                {{ m }}
-              </div>
-            {% endfor %}
+      <main class="space-y-6">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div id="flashes" class="space-y-2">
+              {% for c,m in messages %}
+                <div class="flash-message rounded-xl px-4 py-3 text-sm
+                            {% if c in ['error','danger'] %} bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30
+                            {% elif c == 'success' %} bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30
+                            {% else %} bg-white/5 text-slate-200 ring-1 ring-white/10 {% endif %}">
+                  {{ m }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        <form class="p-6 rounded-2xl bg-white/5 ring-1 ring-white/10 grid grid-cols-1 sm:grid-cols-[200px,1fr,auto,auto] gap-4" method="get">
+          <div>
+            <label for="estado" class="block text-sm font-medium text-slate-200 mb-1">Estado</label>
+            <select id="estado" name="estado"
+                    class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              <option value="">Todos</option>
+              {% for e in ['abierto','pendiente','resuelto','cerrado'] %}
+                <option value="{{ e }}" {% if estado==e %}selected{% endif %}>{{ e|capitalize }}</option>
+              {% endfor %}
+            </select>
           </div>
-        {% endif %}
-      {% endwith %}
 
-      <form class="mb-6 p-6 bg-white rounded-xl shadow-lg border border-slate-200 flex flex-col sm:flex-row sm:items-end gap-4" method="get">
-        <div>
-          <label for="estado" class="block text-sm font-medium text-slate-700 mb-1">Estado</label>
-          <select id="estado" name="estado" class="w-full sm:w-auto px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-            <option value="">Todos</option>
-            {% for e in ['abierto','pendiente','resuelto','cerrado'] %}
-              <option value="{{ e }}" {% if estado==e %}selected{% endif %}>{{ e|capitalize }}</option>
-            {% endfor %}
-          </select>
-        </div>
+          <div class="flex-1 min-w-[200px]">
+            <label for="q" class="block text-sm font-medium text-slate-200 mb-1">Buscar</label>
+            <input type="text" id="q" name="q" value="{{ q or '' }}" placeholder="Asunto, usuario o email"
+                   class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm" />
+          </div>
 
-        <div class="flex-1 min-w-[200px]">
-          <label for="q" class="block text-sm font-medium text-slate-700 mb-1">Buscar</label>
-          <input type="text" id="q" name="q" value="{{ q or '' }}" placeholder="Asunto, usuario o email"
-                 class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm" />
-        </div>
-
-        <div class="flex space-x-2">
           <button type="submit"
-                  class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-sm hover:bg-blue-700 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 -ml-1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-            </svg>
+                  class="self-end inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-semibold shadow-glow">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.2-5.2m0 0A7.5 7.5 0 105.2 5.2a7.5 7.5 0 0010.6 10.6z"/></svg>
             Filtrar
           </button>
 
           <a href="{{ url_for('admin.support_list') }}"
-             class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-slate-700 font-semibold rounded-lg shadow-sm border border-slate-300 hover:bg-slate-50 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 -ml-1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-            </svg>
+             class="self-end inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white/5 ring-1 ring-white/10 text-slate-200 hover:bg-white/10">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182v-4.99"/></svg>
             Limpiar
           </a>
+        </form>
+
+        <!-- Tabla -->
+        <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead class="bg-white/5 ring-1 ring-white/10">
+              <tr class="text-left text-slate-300">
+                <th class="py-3.5 px-5 font-semibold">ID</th>
+                <th class="py-3.5 px-5 font-semibold">Asunto</th>
+                <th class="py-3.5 px-5 font-semibold">Usuario</th>
+                <th class="py-3.5 px-5 font-semibold">Estado</th>
+                <th class="py-3.5 px-5 font-semibold">Creado</th>
+                <th class="py-3.5 px-5 font-semibold">Actualizado</th>
+                <th class="py-3.5 px-5 font-semibold">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% set estado_clases = {
+                'abierto':   'bg-brand-900/30 text-brand-200 ring-1 ring-brand-500/30',
+                'pendiente': 'bg-amber-900/30 text-amber-200 ring-1 ring-amber-500/30',
+                'resuelto':  'bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30',
+                'cerrado':   'bg-slate-800 text-slate-400 ring-1 ring-white/10'
+              } %}
+              {% for t in tickets %}
+                <tr class="border-t border-white/10 hover:bg-white/5">
+                  <td class="py-3 px-5 font-mono text-xs text-slate-400">#{{ t.id }}</td>
+                  <td class="py-3 px-5 text-slate-100">{{ t.asunto }}</td>
+                  <td class="py-3 px-5">
+                    <div class="text-slate-100">{{ t.usuario }}</div>
+                    <div class="text-xs text-slate-400">{{ t.email }}</div>
+                  </td>
+                  <td class="py-3 px-5">
+                    <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {{ estado_clases.get(t.estado|lower, estado_clases['cerrado']) }}">
+                      {{ t.estado|capitalize }}
+                    </span>
+                  </td>
+                  <td class="py-3 px-5 text-slate-300">{{ t.creado_en }}</td>
+                  <td class="py-3 px-5 text-slate-300">{{ t.actualizado_en or '—' }}</td>
+                  <td class="py-3 px-5">
+                    <a href="{{ url_for('admin.support_ticket_detail', ticket_id=t.id) }}"
+                       title="Ver ticket"
+                       class="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-white/5 ring-1 ring-white/10 text-slate-200 hover:bg-white/10">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </a>
+                  </td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="7" class="py-6 px-5 text-center text-slate-400 italic">
+                    No se encontraron tickets con los filtros aplicados.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
-      </form>
-
-      <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-x-auto">
-        <table class="min-w-full text-sm">
-          <thead class="bg-slate-100 border-b border-slate-200">
-            <tr>
-              <th class="py-3 px-5 text-left text-sm font-semibold text-slate-600">ID</th>
-              <th class="py-3 px-5 text-left text-sm font-semibold text-slate-600">Asunto</th>
-              <th class="py-3 px-5 text-left text-sm font-semibold text-slate-600">Usuario</th>
-              <th class="py-3 px-5 text-left text-sm font-semibold text-slate-600">Estado</th>
-              <th class="py-3 px-5 text-left text-sm font-semibold text-slate-600">Creado</th>
-              <th class="py-3 px-5 text-left text-sm font-semibold text-slate-600">Actualizado</th>
-              <th class="py-3 px-5 text-left text-sm font-semibold text-slate-600">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% set estado_clases = {
-              'abierto':   'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-200',
-              'pendiente': 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200',
-              'resuelto':  'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200',
-              'cerrado':   'bg-slate-100 text-slate-600 ring-1 ring-inset ring-slate-200'
-            } %}
-
-            {% for t in tickets %}
-              <tr class="border-b border-slate-200 last:border-b-0 hover:bg-slate-50">
-                <td class="py-3 px-5 font-mono text-xs text-slate-500">#{{ t.id }}</td>
-                <td class="py-3 px-5 text-slate-700">{{ t.asunto }}</td>
-                <td class="py-3 px-5 text-slate-700">
-                  {{ t.usuario }}
-                  <span class="block text-xs text-slate-400">{{ t.email }}</span>
-                </td>
-                <td class="py-3 px-5">
-                  <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {{ estado_clases.get(t.estado|lower, estado_clases['cerrado']) }}">
-                    {{ t.estado|capitalize }}
-                  </span>
-                </td>
-                <td class="py-3 px-5 text-slate-500">{{ t.creado_en }}</td>
-                <td class="py-3 px-5 text-slate-500">{{ t.actualizado_en or '—' }}</td>
-                <td class="py-3 px-5">
-                  <a href="{{ url_for('admin.support_ticket_detail', ticket_id=t.id) }}"
-                     title="Ver ticket"
-                     class="p-2 rounded-lg text-slate-500 transition-colors duration-150 hover:bg-blue-50 hover:text-blue-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </a>
-                </td>
-              </tr>
-            {% else %}
-              <tr>
-                <td colspan="7" class="py-6 px-5 text-center text-slate-500 italic">
-                  No se encontraron tickets con los filtros aplicados.
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </main>
-  </div>
-
-  <footer class="bg-slate-100 border-t border-slate-200 py-8">
-    <div class="max-w-7xl mx-auto text-center">
-      <p class="text-sm text-slate-500">&copy; 2025 Translate It. Todos los derechos reservados.</p>
+      </main>
     </div>
-  </footer>
+  </div>
+</section>
+{% endblock %}
 
-  <script>
-    // Auto-cerrar mensajes flash
-    (function () {
-      const box = document.getElementById('flashes');
-      if (!box) return;
-      setTimeout(() => {
-        box.querySelectorAll('div').forEach(flash => {
-          flash.classList.add('flash-fade-out');
-          setTimeout(() => flash.remove(), 500);
-        });
-      }, 5000);
-    })();
-  </script>
-</body>
-</html>
+{% block scripts %}
+<script>
+  setTimeout(() => {
+    document.querySelectorAll('.flash-message').forEach(el => {
+      el.classList.add('opacity-0','transition','duration-700');
+      setTimeout(() => el.remove(), 700);
+    });
+  }, 5000);
+</script>
+{% endblock %}

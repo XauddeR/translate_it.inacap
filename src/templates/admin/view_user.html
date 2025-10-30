@@ -1,285 +1,216 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .flash-fade-out {
-      opacity: 0;
-      transition: opacity 0.5s ease-out;
-    }
-  </style>
-  <title>Translate It - Admin Dashboard</title>
-</head>
+{% extends "base.html" %}
+{% block title %}Usuarios Registrados — Translate It{% endblock %}
 
-<body class="bg-slate-50 text-slate-800 min-h-screen font-sans antialiased flex flex-col">
+{% block content %}
+<section class="relative">
+  <div class="absolute inset-0 -z-10">
+    <div class="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] rounded-full blur-3xl opacity-30"
+         style="background: radial-gradient(closest-side, rgba(59,130,246,.35), rgba(29,78,216,.25), transparent 70%);"></div>
+  </div>
 
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto flex items-center justify-between py-5 px-6">
-      <h1 class="text-3xl font-extrabold text-blue-600 tracking-tight">
-        <a href="{{ url_for('main.index') }}">Translate It</a>
-      </h1>
-      <nav class="space-x-6 text-sm font-medium flex items-center">
-        <a href="{{ url_for('main.index') }}" class="text-slate-600 hover:text-blue-600 transition">INICIO</a>
-        <a href="{{ url_for('auth.logout') }}" class="text-red-500 hover:text-red-600 font-medium">CERRAR SESIÓN</a>
-      </nav>
-    </div>
-  </header>
-
-  <div class="flex flex-1">
-    
-    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col">
-      <nav class="flex-1 px-4 py-6">
-        <ul class="space-y-2 text-sm">
-          <li>
-            <a href="{{ url_for('admin.admin_dashboard') }}" 
-               class="flex items-center space-x-3 py-2 px-3 rounded-md transition text-slate-600 hover:bg-blue-50 hover:text-blue-700">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M3.75 6A2.25 2.25 0 016 3.75h12A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6zM3.75 12H6m1.5 0h.008m.007 0H9m.75 0h.008m.007 0h.75m3 0h.008m.007 0h.75m1.5 0h.008m.007 0H18m-9 3.75h.008m.007 0h.75m1.5 0h.008m.007 0h.75m-3-7.5h.008m.007 0h.75m1.5 0h.008m.007 0h.75" />
-              </svg>
-              <span>Dashboard</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="{{ url_for('admin.view_users') }}" 
-               class="flex items-center space-x-3 py-2 px-3 rounded-md transition font-semibold bg-blue-50 text-blue-700">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                   stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952
-                         4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07
-                         M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766
-                         l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0
-                         3.375 3.375 0 016.75 0zM12 12.75c-1.84 0-3.375.636-3.375 1.406v.75h6.75v
-                         -.75c0-.77-.52-1.406-3.375-1.406z" />
-              </svg>
-              <span>USUARIOS REGISTRADOS</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="{{ url_for('admin.support_list') }}" class="flex items-center space-x-3 py-2 px-3 rounded-md transition text-slate-600 hover:bg-blue-50 hover:text-blue-700">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                   stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0
-                         1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442
-                         -.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0
-                         9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-              </svg>
-              <span>SOPORTE</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </aside>
-
-    <main id="mainContent" class="flex-1 p-10 bg-slate-50">
-      
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <div id="mainFlashContainer" class="max-w-4xl mx-auto mb-6 space-y-3">
-            {% for category, message in messages %}
-              {% if category != 'add_user_error' %}
-                <div class="flash-message-item p-4 rounded-lg shadow-sm 
-                            {% if 'success' in category %}bg-green-50 text-green-700 border border-green-200
-                            {% elif 'error' in category %}bg-red-50 text-red-700 border border-red-200
-                            {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
-                  {{ message }}
-                </div>
-              {% endif %}
-            {% endfor %}
-          </div>
-        {% endif %}
-      {% endwith %}
-
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-4xl font-extrabold text-slate-900">Usuarios Registrados</h1>
-        <a href="#" 
-           onclick="openAddUserModal()"
-           class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-sm hover:bg-green-700 transition-all duration-300
-                  focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-               stroke-width="2" stroke="currentColor" class="w-5 h-5 -ml-1">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-14">
+    <div class="flex items-center justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Usuarios Registrados</h1>
+        <p class="mt-1 text-slate-300">Gestiona cuentas, roles y acceso a Translate It.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="#" onclick="openAddUserModal()"
+           class="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-glow">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          Crear Usuario
+          Crear usuario
         </a>
       </div>
+    </div>
 
-      <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-slate-100 border-b border-slate-200">
-            <tr>
-              <th class="py-3 px-5 text-left text-sm font-semibold text-slate-600">ID</th>
-              <th class="py-3 px-5 text-left text-sm font-semibold text-slate-600">Usuario</th>
-              <th class="py-3 px-5 text-left text-sm font-semibold text-slate-600">Correo</th>
-              <th class="py-3 px-5 text-left text-sm font-semibold text-slate-600">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for u in users %}
-            <tr class="border-b border-slate-200 hover:bg-slate-50">
-              <td class="py-3 px-5 text-sm text-slate-700">{{ u.id }}</td>
-              <td class="py-3 px-5 text-sm text-slate-700">{{ u.usuario }}</td>
-              <td class="py-3 px-5 text-sm text-slate-700">{{ u.email }}</td>
-              <td class="py-3 px-5">
-                <div class="flex space-x-1">
-                  <a href="{{ url_for('admin.update_user', user_id = u.id) }}" 
-                     title="Editar"
-                     class="p-2 rounded-lg text-slate-500 transition-colors duration-150 hover:bg-yellow-50 hover:text-yellow-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                         stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582
-                               16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0
-                               011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25
-                               2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25
-                               2.25 0 015.25 6H10" />
-                    </svg>
-                  </a>
+    <div class="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
+      <aside class="md:sticky md:top-24 md:self-start rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 md:p-5 md:block">
+        <nav>
+          <ul class="space-y-1 text-sm">
+            <li>
+              <a href="{{ url_for('admin.admin_dashboard') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:ring-1 hover:ring-white/10 text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-width="1.7" d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17"/></svg>
+                Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('admin.view_users') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg bg-brand-600/20 text-brand-200 ring-1 ring-brand-500/30">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                <path d="M 12 4 A 4 4 0 1 1 12 12 A 4 4 0 1 1 12 4 Z M 4 20 C 4 15 8 13 12 13 C 16 13 20 15 20 20 Z" />
+              </svg>
+                Usuarios
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('admin.support_list') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:ring-1 hover:ring-white/10 text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.88 7.52c1.17-1.02 3.07-1.02 4.24 0 1.17 1.02 1.17 2.69 0 3.71-.2.18-.43.33-.67.44-.75.36-1.45 1-1.45 1.83v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/>
+                </svg>
+                Soporte
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
 
-                  <a href="{{ url_for('admin.delete_user', user_id = u.id) }}" 
-                     title="Eliminar"
-                     class="p-2 rounded-lg text-slate-500 transition-colors duration-150 hover:bg-red-50 hover:text-red-600"
-                     onclick="return confirm('¿Seguro que deseas eliminar este usuario?')">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                         stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21
-                               c.342.052.682.107 1.022.166m-1.022-.165L18.16
-                               19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25
-                               2.25 0 01-2.244-2.077L4.772 5.79m14.456
-                               0a48.108 48.108 0 00-3.478-.397m-12.54
-                               0c-.27.041-.533.09-.79.143m-4.009
-                               0H4.66a48.609 48.609 0 013.478-.397m7.5
-                               0v-.916c0-1.18-.91-2.144-2.032-2.144A48.77
-                               48.77 0 0012 3c-2.392 0-4.744.175-7.032.511C3.84
-                               3.68 3 4.644 3 5.828v.916m7.5 0h-7.5" />
-                    </svg>
-                  </a>
-                </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <main class="space-y-6">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div id="mainFlashContainer" class="mb-2 space-y-2">
+              {% for category, message in messages %}
+                {% if category != 'add_user_error' %}
+                  <div class="flash-message-item rounded-xl px-4 py-3 text-sm
+                              {% if 'success' in category %} bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30
+                              {% elif 'error' in category %} bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30
+                              {% else %} bg-white/5 text-slate-200 ring-1 ring-white/10 {% endif %}">
+                    {{ message }}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-white/5 ring-1 ring-white/10">
+              <tr class="text-left text-slate-300">
+                <th class="py-3.5 px-5 font-semibold">ID</th>
+                <th class="py-3.5 px-5 font-semibold">Usuario</th>
+                <th class="py-3.5 px-5 font-semibold">Correo</th>
+                <th class="py-3.5 px-5 font-semibold">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in users %}
+              <tr class="border-t border-white/10 hover:bg-white/5">
+                <td class="py-3 px-5 text-slate-200">{{ u.id }}</td>
+                <td class="py-3 px-5 text-slate-200">{{ u.usuario }}</td>
+                <td class="py-3 px-5 text-slate-300">{{ u.email }}</td>
+                <td class="py-3 px-5">
+                  <div class="flex gap-1">
+                    <a href="{{ url_for('admin.update_user', user_id = u.id) }}" title="Editar"
+                       class="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-white/5 ring-1 ring-white/10 text-amber-200 hover:bg-white/10">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                      </svg>
+                    </a>
+                    <a href="{{ url_for('admin.delete_user', user_id = u.id) }}"
+                       onclick="return confirm('¿Seguro que deseas eliminar este usuario?')"
+                       title="Eliminar"
+                       class="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-white/5 ring-1 ring-white/10 text-rose-200 hover:bg-white/10">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12.54 0c-.27.041-.533.09-.79.143m-4.009 0H4.66a48.609 48.609 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.144-2.032-2.144A48.77 48.77 0 0012 3c-2.392 0-4.744.175-7.032.511C3.84 3.68 3 4.644 3 5.828v.916m7.5 0h-7.5" />
+                      </svg>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="md:hidden">
+          <a href="#" onclick="openAddUserModal()"
+             class="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-glow">
+            + Crear usuario
+          </a>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<div id="addUserModal"
+     class="fixed inset-0 z-50 hidden items-center justify-center">
+  <div class="absolute inset-0 bg-slate-900/80 backdrop-blur" onclick="closeAddUserModal()"></div>
+  <div class="relative z-10 w-[95%] max-w-md rounded-2xl bg-slate-950 ring-1 ring-white/10 p-6">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="modalFlashContainer" class="mb-4 space-y-2">
+          {% for category, message in messages %}
+            {% if category == 'add_user_error' %}
+              <div class="flash-message-item rounded-xl px-4 py-3 text-sm bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30">
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <h2 class="text-xl font-bold text-slate-100 text-center">Crear nuevo usuario</h2>
+
+    <form id="addUserForm" method="POST" action="{{ url_for('admin.add_user') }}" class="mt-5 space-y-5">
+      <div>
+        <label for="usuario" class="block text-sm font-medium text-slate-200 mb-1">Nombre de usuario</label>
+        <input type="text" id="usuario" name="usuario" required
+               class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
       </div>
-    </main>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-slate-200 mb-1">Correo electrónico</label>
+        <input type="email" id="email" name="email" required
+               class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-slate-200 mb-1">Contraseña</label>
+        <input type="password" id="password" name="password" required
+               class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+      </div>
+
+      <div>
+        <label for="nivel" class="block text-sm font-medium text-slate-200 mb-1">Tipo de usuario</label>
+        <select id="nivel" name="nivel" required
+                class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+          <option value="usuario">Usuario</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button type="button" onclick="closeAddUserModal()"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 ring-1 ring-white/10 text-slate-200 hover:bg-white/10">
+          Cancelar
+        </button>
+        <button type="submit"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-glow">
+          Crear
+        </button>
+      </div>
+    </form>
   </div>
+</div>
+{% endblock %}
 
-  <div id="addUserModal"
-       class="fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 
-              {% if get_flashed_messages(category_filter=['add_user_error']) %}flex{% else %}hidden{% endif %}">
+{% block scripts %}
+<script>
+  const addModal = document.getElementById('addUserModal');
+  function openAddUserModal() {
+    addModal.classList.remove('hidden');
+    addModal.classList.add('flex');
+    const modalFlash = document.getElementById('modalFlashContainer');
+    if (modalFlash) modalFlash.innerHTML = '';
+  }
+  function closeAddUserModal() {
+    addModal.classList.add('hidden');
+    addModal.classList.remove('flex');
+  }
+  addModal.addEventListener('click', (e) => { if (e.target === addModal) closeAddUserModal(); });
 
-    <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-md mx-4">
-      
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <div id="modalFlashContainer" class="mb-4 space-y-2">
-            {% for category, message in messages %}
-              {% if category == 'add_user_error' %}
-                <div class="flash-message-item p-3 rounded-lg shadow-sm text-sm bg-red-50 text-red-700 border border-red-200" role="alert">
-                  {{ message }}
-                </div>
-              {% endif %}
-            {% endfor %}
-          </div>
-        {% endif %}
-      {% endwith %}
-
-      <h2 class="text-2xl font-extrabold text-slate-900 mb-6 text-center">Crear nuevo usuario</h2>
-
-      <form id="addUserForm" method="POST" action="{{ url_for('admin.add_user') }}" class="space-y-5">
-        <div>
-          <label for="usuario" class="block text-sm font-medium text-slate-700 mb-1">Nombre de usuario</label>
-          <input type="text" id="usuario" name="usuario" required
-                 class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-        </div>
-
-        <div>
-          <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Correo electrónico</label>
-          <input type="email" id="email" name="email" required
-                 class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-        </div>
-
-        <div>
-          <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
-          <input type="password" id="password" name="password" required
-                 class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-        </div>
-
-        <div>
-          <label for="nivel" class="block text-sm font-medium text-slate-700 mb-1">Tipo de usuario</label>
-          <select id="nivel" name="nivel" required
-                  class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            <option value="usuario">Usuario</option>
-            <option value="admin">Administrador</option>
-          </select>
-        </div>
-
-        <div class="flex justify-end space-x-3 pt-4">
-          <button type="button" onclick="closeAddUserModal()" 
-                  class="px-5 py-2 bg-white text-slate-700 font-semibold rounded-lg shadow-sm border border-slate-300 hover:bg-slate-50 transition">
-            Cancelar
-          </button>
-          <button type="submit"
-                  class="px-5 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-sm hover:bg-green-700 transition">
-            Crear
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <footer class="bg-slate-100 border-t border-slate-200 py-8">
-    <div class="max-w-7xl mx-auto text-center">
-      <p class="text-sm text-slate-500">&copy; 2025 Translate It. Todos los derechos reservados.</p>
-    </div>
-  </footer>
-
-  <script>
-    const addModal = document.getElementById('addUserModal');
-    const modalFlashContainer = document.getElementById('modalFlashContainer');
-    const mainFlashContainer = document.getElementById('mainFlashContainer');
-
-    function openAddUserModal() {
-      if (modalFlashContainer) {
-        modalFlashContainer.innerHTML = '';
-      }
-      addModal.classList.remove('hidden');
-      addModal.classList.add('flex');
-    }
-
-    function closeAddUserModal() {
-      addModal.classList.add('hidden');
-      addModal.classList.remove('flex');
-      if (modalFlashContainer) {
-        modalFlashContainer.innerHTML = '';
-      }
-    }
-
-    addModal.addEventListener('click', function (e) {
-      if (e.target === addModal) {
-        closeAddUserModal();
-      }
+  setTimeout(() => {
+    document.querySelectorAll('.flash-message-item').forEach(el => {
+      el.classList.add('opacity-0','transition','duration-700');
+      setTimeout(() => el.remove(), 700);
     });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const allFlashMessages = document.querySelectorAll('.flash-message-item');
-      if (allFlashMessages.length > 0) {
-        setTimeout(() => {
-          allFlashMessages.forEach(flash => {
-            flash.classList.add('flash-fade-out');
-            setTimeout(() => flash.remove(), 500);
-          });
-        }, 5000);
-      }
-    });
-  </script>
-
-</body>
-</html>
+  }, 5000);
+</script>
+{% endblock %}

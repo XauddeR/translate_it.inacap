@@ -1,61 +1,107 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <title>Login - Translate It</title>
-</head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+{% extends "base.html" %}
+{% block title %}Iniciar sesión — Translate It{% endblock %}
 
-    <h2 class="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          {% if category == "login_error" %}
-            <div class="mb-4 p-3 rounded bg-red-100 text-red-800 border border-red-300 text-sm">
-              {{ message }}
-            </div>
-          {% else %}
-            <div class="flash-message mb-4 p-3 rounded bg-gray-100 text-gray-800 border border-gray-300 text-sm">
-              {{ message }}
-            </div>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-    <form action="/login" method="POST" class="space-y-4">
-      <div>
-        <label for="email" class="block font-semibold">Correo electrónico:</label>
-        <input type="email" name="email" id="email" required
-          class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-      </div>
-      <div>
-        <label for="password" class="block font-semibold">Contraseña:</label>
-        <input type="password" name="password" id="password" required
-          class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-      </div>
-      <button type="submit"
-        class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition">
-        Entrar
-      </button>
-    </form>
-
-
-    <p class="text-sm text-center mt-4">¿No tienes cuenta?
-      <a href="/register" class="text-blue-600 hover:underline">Regístrate</a>
-    </p>
+{% block content %}
+<section class="relative">
+  <!-- Fondo sutil para consistencia visual -->
+  <div class="absolute inset-0 -z-10">
+    <img
+      src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=2000&q=80"
+      alt="" class="h-full w-full object-cover opacity-10" />
+    <div class="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-950/70 to-slate-950"></div>
   </div>
-</body>
 
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+    <div class="mx-auto max-w-md">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-extrabold tracking-tight">Iniciar sesión</h1>
+        <p class="mt-2 text-slate-300">Accede a tu panel para subir, transcribir y traducir tus archivos.</p>
+      </div>
+
+      <!-- Flashes -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="mb-4 space-y-2" id="flashContainer">
+            {% for category, message in messages %}
+              {% if category == "login_error" %}
+                <div class="flash-message rounded-xl px-4 py-3 text-sm bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30">
+                  {{ message }}
+                </div>
+              {% else %}
+                <div class="flash-message rounded-xl px-4 py-3 text-sm bg-white/5 text-slate-200 ring-1 ring-white/10">
+                  {{ message }}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form action="{{ url_for('auth.login') }}" method="POST"
+            class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 sm:p-8 space-y-5">
+        {{ form.hidden_tag() if form is defined }}
+
+        <div>
+          <label for="email" class="block mb-2 text-sm font-medium text-slate-200">Correo electrónico</label>
+          <input type="email" name="email" id="email" required
+                 value="{{ request.form.email or '' }}"
+                 autocomplete="email"
+                 class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500" />
+          {% if errors and errors.get('email') %}
+            <p class="mt-2 text-xs text-rose-300">{{ errors.get('email')[0] }}</p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label for="password" class="block mb-2 text-sm font-medium text-slate-200">Contraseña</label>
+          <div class="relative">
+            <input type="password" name="password" id="password" required
+                   autocomplete="current-password"
+                   class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 pr-10 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500" />
+            <button type="button" id="togglePwd"
+                    class="absolute inset-y-0 right-2 my-auto h-8 w-8 grid place-items-center rounded-md text-slate-300 hover:text-white"
+                    aria-label="Mostrar/ocultar contraseña">👁️</button>
+          </div>
+          {% if errors and errors.get('password') %}
+            <p class="mt-2 text-xs text-rose-300">{{ errors.get('password')[0] }}</p>
+          {% endif %}
+        </div>
+
+        <div class="flex items-center justify-between">
+          <a href="{{ url_for('auth.login') }}#"
+             class="text-sm text-brand-300 hover:text-brand-200">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button type="submit"
+                class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-semibold py-2.5 shadow-glow">
+          Entrar
+        </button>
+
+        <p class="text-center text-sm text-slate-300">
+          ¿No tienes cuenta?
+          <a href="{{ url_for('auth.register') }}" class="text-brand-300 hover:text-brand-200 font-medium">Regístrate</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
 <script>
+  // Mostrar/ocultar contraseña
+  const toggle = document.getElementById('togglePwd');
+  const pwd = document.getElementById('password');
+  toggle?.addEventListener('click', () => {
+    pwd.type = pwd.type === 'password' ? 'text' : 'password';
+  });
+
+  // Autodesvanecimiento de flashes
   setTimeout(() => {
-    const flashes = document.querySelectorAll('.flash-message');
-    flashes.forEach(flash => {
-      flash.classList.add('opacity-0', 'transition', 'duration-700');
-      setTimeout(() => flash.remove(), 700);
+    document.querySelectorAll('.flash-message').forEach(el => {
+      el.classList.add('opacity-0', 'transition', 'duration-700');
+      setTimeout(() => el.remove(), 700);
     });
   }, 5000);
 </script>
-</html>
+{% endblock %}

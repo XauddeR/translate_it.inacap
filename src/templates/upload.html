@@ -1,69 +1,119 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <title>Subir Video</title>
-</head>
+{% extends "base.html" %}
+{% block title %}Subir Video — Translate It{% endblock %}
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
-    <h1 class="text-2xl font-bold text-blue-600 mb-6 text-center">Subir Video</h1>
-
-    <form action="{{ url_for('upload.upload_file') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-      <div>
-        <label for="language" class="block text-gray-700 font-semibold mb-2">Selecciona idioma destino:</label>
-        <select id="language" name="language" required
-                class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option value="es">Español</option>
-          <option value="en-us">Inglés</option>
-          <option value="pt-br">Portugués</option>
-        </select>
-      </div>
-
-      <div>
-        <label for="video" class="block text-gray-700 font-semibold mb-2">Sube un archivo de video:</label>
-        <input type="file" name="video" accept="video/*" required
-               class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md cursor-pointer bg-white 
-               file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold 
-               file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-      </div>
-
-      <button type="submit"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-200">
-        Subir
-      </button>
-    </form>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="mt-4 space-y-2">
-          {% for category, message in messages %}
-            {% if "upload" in category %}
-              <div class="flash-message p-3 rounded-lg text-sm
-                {% if "success" in category %} bg-green-100 text-green-700
-                {% elif "error" in category %} bg-red-100 text-red-700
-                {% else %} bg-blue-100 text-blue-700
-                {% endif %}">
-                {{ message }}
-              </div>
-            {% endif %}
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
-
+{% block content %}
+<section class="relative">
+  <div class="absolute inset-0 -z-10">
+    <div class="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] rounded-full blur-3xl opacity-30"
+         style="background: radial-gradient(closest-side, rgba(59,130,246,.35), rgba(29,78,216,.25), transparent 70%);"></div>
   </div>
-</body>
 
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-14">
+    <div class="flex items-center justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Subir Video</h1>
+        <p class="mt-1 text-slate-300">Convierte tu contenido audiovisual en texto y tradúcelo con IA.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
+      <aside class="md:sticky md:top-24 md:self-start rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 md:p-5 md:block">
+        <nav>
+          <ul class="space-y-1 text-sm">
+            <li>
+              <a href="{{ url_for('main.dashboard') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:ring-1 hover:ring-white/10 text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-width="1.7" d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17"/></svg>
+                Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('upload.upload_file') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg bg-brand-600/20 text-brand-200 ring-1 ring-brand-500/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-width="1.7" d="M12 4v16m8-8H4"/></svg>
+                Subir Video
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('main.history') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:ring-1 hover:ring-white/10 text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-width="1.7" d="M3 12a9 9 0 0118 0A9 9 0 013 12zm9-7v4l2 2"/></svg>
+                Historial
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('support.support_home') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:ring-1 hover:ring-white/10 text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-width="1.7" d="M9.88 7.52c1.17-1.02 3.07-1.02 4.24 0 1.17 1.02 1.17 2.69 0 3.71-.2.18-.43.33-.67.44-.75.36-1.45 1-1.45 1.83v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+                Soporte
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="mb-6 space-y-2" id="flashContainer">
+              {% for category, message in messages %}
+                {% if 'upload' in category %}
+                  <div class="flash-message rounded-xl px-4 py-3 text-sm
+                              {% if 'success' in category %} bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30
+                              {% elif 'error' in category %} bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30
+                              {% else %} bg-white/5 text-slate-200 ring-1 ring-white/10 {% endif %}">
+                    {{ message }}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-8">
+          <h2 class="text-2xl font-semibold mb-6">Selecciona tu archivo y el idioma de destino</h2>
+          <form action="{{ url_for('upload.upload_file') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <div>
+              <label for="language" class="block text-sm font-medium text-slate-200 mb-1">Idioma destino</label>
+              <select id="language" name="language" required
+                      class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+                <option value="es">Español</option>
+                <option value="en-us">Inglés</option>
+                <option value="pt-br">Portugués</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="video" class="block text-sm font-medium text-slate-200 mb-1">Sube tu video</label>
+              <input type="file" name="video" accept="video/*" required
+                     class="block w-full text-sm text-slate-200 border border-white/10 rounded-lg cursor-pointer bg-slate-900/60
+                            file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold
+                            file:bg-brand-900/40 file:text-brand-200 hover:file:bg-brand-800/40 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+              <p class="mt-2 text-xs text-slate-400">Formatos permitidos: MP4, MOV, MKV, AVI</p>
+            </div>
+
+            <button type="submit"
+                    class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-semibold py-2.5 shadow-glow">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              Subir
+            </button>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
 <script>
   setTimeout(() => {
-    const flashes = document.querySelectorAll('.flash-message');
-    flashes.forEach(flash => {
-      flash.classList.add('opacity-0', 'transition', 'duration-700');
-      setTimeout(() => flash.remove(), 700);
+    document.querySelectorAll('.flash-message').forEach(el => {
+      el.classList.add('opacity-0', 'transition', 'duration-700');
+      setTimeout(() => el.remove(), 700);
     });
   }, 5000);
 </script>
-</html>
+{% endblock %}
