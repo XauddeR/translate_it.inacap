@@ -1,7 +1,6 @@
 import os 
 import uuid
 from flask import Blueprint, request, redirect, url_for, flash, render_template, current_app
-from moviepy import VideoFileClip
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from services.deepl_api import translate_text

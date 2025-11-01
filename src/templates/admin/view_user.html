@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-{% block title %}Usuarios Registrados — Translate It{% endblock %}
+{% from "_forms.html" import csrf %}
+
+{% block title %}Usuarios — Translate It{% endblock %}
 
 {% block content %}
 <section class="relative">
@@ -135,7 +137,7 @@
 </section>
 
 <div id="confirmDeleteModal" class="fixed inset-0 z-[60] hidden items-center justify-center">
-  <div class="absolute inset-0 bg-slate-900/80 backdrop-blur"></div>
+  <div id="confirmOverlay" class="absolute inset-0 bg-slate-900/80 backdrop-blur"></div>
 
   <div class="relative z-10 w-[95%] max-w-md rounded-2xl bg-slate-950 ring-1 ring-white/10 p-6">
     <div class="flex items-start gap-3">
@@ -152,16 +154,17 @@
       </div>
     </div>
 
-    <div class="mt-6 flex justify-end gap-3">
-      <button id="cancelDeleteBtn"
+    <form id="deleteUserForm" method="POST" class="mt-6 flex justify-end gap-3">
+      {{ csrf() }}
+      <button type="button" id="cancelDeleteBtn"
               class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-white/5 ring-1 ring-white/10 text-slate-200 hover:bg-white/10">
         Cancelar
       </button>
-      <button id="confirmDeleteBtn"
+      <button type="submit" id="confirmDeleteBtn"
               class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-semibold">
         Sí, eliminar
       </button>
-    </div>
+    </form>
   </div>
 </div>
 
@@ -187,6 +190,7 @@
     <h2 class="text-xl font-bold text-slate-100 text-center">Crear nuevo usuario</h2>
 
     <form id="addUserForm" method="POST" action="{{ url_for('admin.add_user') }}" class="mt-5 space-y-5">
+      {{ csrf() }}
       <div>
         <label for="usuario" class="block text-sm font-medium text-slate-200 mb-1">Nombre de usuario</label>
         <input type="text" id="usuario" name="usuario" required
@@ -234,38 +238,34 @@
   <div class="relative z-10 w-[95%] max-w-md rounded-2xl bg-slate-950 ring-1 ring-white/10 p-6">
     <h2 class="text-xl font-bold text-slate-100 text-center">Editar usuario</h2>
     <form id="editUserForm" method="POST" class="mt-5 space-y-5">
+      {{ csrf() }}
       <div>
         <label for="edit_usuario" class="block text-sm font-medium text-slate-200 mb-1">Nombre de usuario</label>
         <input type="text" id="edit_usuario" name="usuario" required
-              class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500focus:border-brand-500">
+              class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
       </div>
+
       <div>
         <label for="edit_email" class="block text-sm font-medium text-slate-200 mb-1">Correo electrónico</label>
         <input type="email" id="edit_email" name="email" required
-              class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500focus:border-brand-500">
+              class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
       </div>
+
       <div>
-        <label for="edit_password" class="block text-sm font-medium text-slate-200 mb-1">Nueva contraseña <span class="text-slate-400">(opcional)</span></label>
+        <label for="edit_password" class="block text-sm font-medium text-slate-200 mb-1">
+          Nueva contraseña <span class="text-slate-400">(opcional)</span>
+        </label>
         <input type="password" id="edit_password" name="password" placeholder="Deja en blanco para no cambiar"
-              class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500focus:border-brand-500">
+              class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
       </div>
+
       <div>
         <label for="edit_nivel" class="block text-sm font-medium text-slate-200 mb-1">Rol</label>
         <select id="edit_nivel" name="nivel" required
-                class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500focus:border-brand-500">
+                class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
           <option value="usuario">Usuario</option>
           <option value="admin">Administrador</option>
         </select>
-      </div>
-      <div class="flex justify-end gap-3 pt-2">
-        <button type="button" onclick="closeEditUserModal()"
-                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 ring-1 ring-white/10 text-slate-200 hover:bg-white/10">
-          Cancelar
-        </button>
-        <button type="submit"
-                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold">
-          Guardar cambios
-        </button>
       </div>
     </form>
   </div>
@@ -300,12 +300,11 @@
   function openEditUserModal(id, usuario, email, is_admin) {
     editForm.action = "{{ url_for('admin.update_user', user_id=0) }}".replace('/0', `/${id}`);
 
-    document.getElementById('edit_usuario').value  = usuario || '';
-    document.getElementById('edit_email').value    = email || '';
-
-    const passEl = document.getElementById('edit_password');
-    if (passEl) passEl.value = '';
+    document.getElementById('edit_usuario').value = usuario || '';
+    document.getElementById('edit_email').value   = email || '';
+    const passEl  = document.getElementById('edit_password');
     const nivelEl = document.getElementById('edit_nivel');
+    if (passEl)  passEl.value  = '';
     if (nivelEl) nivelEl.value = (is_admin ? 'admin' : 'usuario');
 
     editModal.classList.remove('hidden');
@@ -318,25 +317,18 @@
   }
 
   editModal?.addEventListener('click', (e) => { if (e.target === editModal) closeEditUserModal(); });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      if (!addModal.classList.contains('hidden')) closeAddUserModal();
-      if (!editModal.classList.contains('hidden')) closeEditUserModal();
-    }
-  });
 
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.btn-edit-user');
     if (!btn) return;
-    const id       = Number(btn.dataset.id);
-    const usuario  = btn.dataset.usuario || '';
-    const email    = btn.dataset.email || '';
-    const isAdmin  = btn.dataset.isAdmin === '1' || btn.dataset.isAdmin === 'true';
-
+    const id      = Number(btn.dataset.id);
+    const usuario = btn.dataset.usuario || '';
+    const email   = btn.dataset.email || '';
+    const isAdmin = btn.dataset.isAdmin === '1' || btn.dataset.isAdmin === 'true';
     openEditUserModal(id, usuario, email, isAdmin);
   });
 
-  editForm?.addEventListener('submit', (e) => {
+  editForm?.addEventListener('submit', () => {
     const submitBtn = editForm.querySelector('button[type="submit"]');
     if (submitBtn) {
       submitBtn.disabled = true;
@@ -345,21 +337,21 @@
   });
 
   const confirmModal = document.getElementById('confirmDeleteModal');
+  const confirmOverlay = document.getElementById('confirmOverlay');
   const cancelDelBtn = document.getElementById('cancelDeleteBtn');
-  const confirmDelBtn = document.getElementById('confirmDeleteBtn');
-  let pendingDeleteUrl = null;
+  const delForm = document.getElementById('deleteUserForm');
 
-  const openConfirm = (url) => {
-    pendingDeleteUrl = url;
+  function openConfirm(url) {
+    delForm.action = url;
     confirmModal.classList.remove('hidden');
     confirmModal.classList.add('flex');
-  };
+  }
 
-  const closeConfirm = () => {
+  function closeConfirm() {
     confirmModal.classList.add('hidden');
     confirmModal.classList.remove('flex');
-    pendingDeleteUrl = null;
-  };
+    delForm.action = '';
+  }
 
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.btn-delete-user');
@@ -369,22 +361,21 @@
   });
 
   cancelDelBtn?.addEventListener('click', closeConfirm);
-  confirmModal?.addEventListener('click', (e) => {
-    if (e.target === confirmModal) closeConfirm();
+  confirmOverlay?.addEventListener('click', closeConfirm);
+
+  delForm?.addEventListener('submit', () => {
+    const btn = delForm.querySelector('button[type="submit"]');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Eliminando…';
+    }
   });
+
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !confirmModal.classList.contains('hidden')) closeConfirm();
+    if (e.key !== 'Escape') return;
+    if (addModal && !addModal.classList.contains('hidden'))  closeAddUserModal();
+    if (editModal && !editModal.classList.contains('hidden')) closeEditUserModal();
+    if (confirmModal && !confirmModal.classList.contains('hidden')) closeConfirm();
   });
-
-  confirmDelBtn?.addEventListener('click', () => {
-    if (!pendingDeleteUrl) return;
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = pendingDeleteUrl;
-    document.body.appendChild(form);
-    form.submit();
-  });
-
 </script>
-
 {% endblock %}

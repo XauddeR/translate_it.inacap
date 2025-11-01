@@ -1,6 +1,7 @@
 import os
 from config import Config
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for, flash
+from flask_wtf.csrf import CSRFProtect, CSRFError 
 from models.user_model import User
 from routes.auth_routes import auth_bp
 from routes.main_routes import main_bp
@@ -9,10 +10,13 @@ from routes.admin_routes import admin_bp
 from routes.support_routes import support_bp
 from utils.extensions import mysql, login_manager
 
+csrf = CSRFProtect()
+
 def translateit():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    csrf.init_app(app)  
     mysql.init_app(app)
     login_manager.init_app(app)
 
@@ -57,7 +61,12 @@ def translateit():
     @app.errorhandler(404)
     def page_not_found(error):
         return render_template('404.html', error = error), 404
-
+    
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        flash('Sesión expirada o token inválido. Vuelve a intentar.', 'error')
+        return redirect(url_for('main.index')), 400
+    
     return app
 
 if __name__ == '__main__':

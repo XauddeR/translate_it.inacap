@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_forms.html" import csrf %}
 {% block title %}Ticket #{{ ticket.id }} — Admin · Translate It{% endblock %}
 
 {% block content %}
@@ -78,7 +79,8 @@
               Creado: {{ ticket.creado_en }}{% if ticket.actualizado_en %} · Actualizado: {{ ticket.actualizado_en }}{% endif %}
             </p>
           </div>
-          <form action="{{ url_for('admin.support_ticket_set_status', ticket_id=ticket.id) }}" method="post" class="flex flex-wrap gap-2">
+          <form action="{{ url_for('admin.support_ticket_set_status', ticket_id=ticket.id) }}" method="POST" class="flex flex-wrap gap-2">
+            {{ csrf() }}
             <button name="estado" value="pendiente" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-900/30 text-amber-200 ring-1 ring-amber-500/30 hover:bg-amber-900/40 transition {% if ticket.estado=='pendiente' %}opacity-50 cursor-not-allowed{% endif %}" {% if ticket.estado=='pendiente' %}disabled{% endif %}>Pendiente</button>
             <button name="estado" value="resuelto" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30 hover:bg-emerald-900/40 transition {% if ticket.estado=='resuelto' %}opacity-50 cursor-not-allowed{% endif %}" {% if ticket.estado=='resuelto' %}disabled{% endif %}>Resuelto</button>
             <button name="estado" value="cerrado" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 ring-1 ring-white/10 hover:bg-slate-700/60 transition {% if ticket.estado=='cerrado' %}opacity-50 cursor-not-allowed{% endif %}" {% if ticket.estado=='cerrado' %}disabled{% endif %}>Cerrar</button>
@@ -109,7 +111,8 @@
         {% if ticket.estado != 'cerrado' %}
           <section class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-5">
             <h3 class="text-lg font-semibold text-slate-100 mb-3">Responder como soporte</h3>
-            <form action="{{ url_for('admin.support_ticket_reply', ticket_id=ticket.id) }}" method="post" id="replyForm" class="space-y-4">
+            <form action="{{ url_for('admin.support_ticket_reply', ticket_id=ticket.id) }}" method="POST" id="replyForm" class="space-y-4">
+              {{ csrf() }}
               <textarea id="message" name="message" rows="5" required
                         placeholder="Escribe tu respuesta aquí…"
                         class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 resize-y text-sm"></textarea>
