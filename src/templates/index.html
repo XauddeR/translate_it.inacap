@@ -5,16 +5,11 @@
 {% endblock %}
 
 {% block header_links %}
-  <a href="#funciona" class="text-slate-200 hover:text-white">Cómo funciona</a>
-  <a href="#caracteristicas" class="text-slate-200 hover:text-white">Características</a>
-  <a href="#faq" class="text-slate-200 hover:text-white">FAQ</a>
+
 {% endblock %}
 
 {% block header_links_mobile %}
-  <a href="#funciona" class="text-slate-200 hover:text-white">Cómo funciona</a>
-  <a href="#caracteristicas" class="text-slate-200 hover:text-white">Características</a>
-  <a href="#faq" class="text-slate-200 hover:text-white">FAQ</a>
-  <div class="h-px bg-white/10 my-2"></div>
+
 {% endblock %}
 
 {% block content %}
@@ -22,7 +17,7 @@
     <div class="absolute inset-0 -z-10">
       <img
         src="https://images.unsplash.com/photo-1644088379091-d574269d422f?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1993"
-        alt="Planeta tierra iluminado desde el espacio"
+        alt="conexiones_imagen"
         class="h-full w-full object-cover opacity-30"
         loading="eager"
         fetchpriority="high"
@@ -64,7 +59,6 @@
     </div>
   </section>
 
-  <!-- Cómo funciona -->
   <section id="funciona" class="max-w-7xl mx-auto px-4 sm:px-6 py-20">
     <div class="grid md:grid-cols-2 gap-10 items-center">
       <div>
@@ -108,48 +102,28 @@
     </div>
   </section>
 
-  <!-- Características -->
   <section id="caracteristicas" class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
     <div class="text-center max-w-3xl mx-auto">
       <h2 class="text-3xl sm:text-4xl font-extrabold">Diseñado para la claridad y precisión</h2>
-      <p class="mt-3 text-slate-300">UI minimalista, accesible y enfocada en el contenido. Integraciones y seguridad listas para producción.</p>
+      <p class="mt-3 text-slate-300">Diseñado para tu comodidad: una experiencia intuitiva en cada clic</p>
     </div>
 
     <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-7 hover:shadow-glow transition">
+      <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-7">
         <h3 class="text-xl font-semibold">Transcripción de vanguardia</h3>
         <p class="mt-2 text-slate-300">Reconoce diferentes acentos e idiomas; ideal para webinars, cursos, podcasts y soporte.</p>
       </div>
-      <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-7 hover:shadow-glow transition">
+      <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-7">
         <h3 class="text-xl font-semibold">Traducción superior</h3>
         <p class="mt-2 text-slate-300">Traducciones con matiz cultural y consistencia terminológica para documentos y subtítulos.</p>
       </div>
-      <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-7 hover:shadow-glow transition">
+      <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-7">
         <h3 class="text-xl font-semibold">Soporte integrado</h3>
-        <p class="mt-2 text-slate-300">Tickets, conversación usuario–admin y control de estados (abierto, pendiente, resuelto, cerrado).</p>
+        <p class="mt-2 text-slate-300">Existe una sección para que puedas resolver tus dudas conversando con un miembro del soporte.</p>
       </div>
     </div>
   </section>
 
-  <!-- Casos de uso -->
-  <section id="casos" class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-    <div class="grid md:grid-cols-3 gap-6">
-      <div class="rounded-2xl bg-gradient-to-br from-brand-900/40 to-slate-900/60 ring-1 ring-white/10 p-7">
-        <h3 class="text-xl font-semibold">Educación y cursos</h3>
-        <p class="mt-2 text-slate-300">Convierte clases en contenido multilingüe y mejora la accesibilidad con transcripciones.</p>
-      </div>
-      <div class="rounded-2xl bg-gradient-to-br from-brand-900/40 to-slate-900/60 ring-1 ring-white/10 p-7">
-        <h3 class="text-xl font-semibold">Marketing global</h3>
-        <p class="mt-2 text-slate-300">Adapta campañas a diferentes mercados sin perder el tono de marca.</p>
-      </div>
-      <div class="rounded-2xl bg-gradient-to-br from-brand-900/40 to-slate-900/60 ring-1 ring-white/10 p-7">
-        <h3 class="text-xl font-semibold">Soporte y CX</h3>
-        <p class="mt-2 text-slate-300">Centraliza tickets y agiliza tiempos de respuesta con contexto completo del usuario.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
   <section id="faq" class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
     <div class="text-center max-w-3xl mx-auto">
       <h2 class="text-3c sm:text-4xl font-extrabold">Preguntas frecuentes</h2>
@@ -188,21 +162,6 @@
         </summary>
         <p class="mt-3 text-slate-300">Crea tickets y conversa con el equipo de soporte hasta resolver tu consulta.</p>
       </details>
-    </div>
-  </section>
-
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-    <div class="rounded-3xl bg-gradient-to-r from-brand-700 to-brand-500 p-1">
-      <div class="rounded-3xl bg-slate-950/80 px-8 py-10 md:px-12 md:py-14 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div>
-          <h3 class="text-2xl sm:text-3xl font-extrabold">Empieza a transformar tu contenido hoy</h3>
-          <p class="mt-2 text-slate-200">Sube tu primer archivo y obtén transcripción y traducción en minutos.</p>
-        </div>
-        <a href="{{ url_for('main.dashboard') if current_user.is_authenticated else url_for('auth.register') }}"
-           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-slate-900 font-semibold hover:bg-slate-100">
-          Ir al Panel →
-        </a>
-      </div>
     </div>
   </section>
 {% endblock %}

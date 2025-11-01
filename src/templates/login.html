@@ -3,10 +3,9 @@
 
 {% block content %}
 <section class="relative">
-  <!-- Fondo sutil para consistencia visual -->
   <div class="absolute inset-0 -z-10">
     <img
-      src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=2000&q=80"
+      src="https://images.unsplash.com/photo-1644088379091-d574269d422f?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1993"
       alt="" class="h-full w-full object-cover opacity-10" />
     <div class="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-950/70 to-slate-950"></div>
   </div>
@@ -18,7 +17,6 @@
         <p class="mt-2 text-slate-300">Accede a tu panel para subir, transcribir y traducir tus archivos.</p>
       </div>
 
-      <!-- Flashes -->
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           <div class="mb-4 space-y-2" id="flashContainer">
@@ -40,7 +38,6 @@
       <form action="{{ url_for('auth.login') }}" method="POST"
             class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 sm:p-8 space-y-5">
         {{ form.hidden_tag() if form is defined }}
-
         <div>
           <label for="email" class="block mb-2 text-sm font-medium text-slate-200">Correo electrónico</label>
           <input type="email" name="email" id="email" required
@@ -58,9 +55,6 @@
             <input type="password" name="password" id="password" required
                    autocomplete="current-password"
                    class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 pr-10 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500" />
-            <button type="button" id="togglePwd"
-                    class="absolute inset-y-0 right-2 my-auto h-8 w-8 grid place-items-center rounded-md text-slate-300 hover:text-white"
-                    aria-label="Mostrar/ocultar contraseña">👁️</button>
           </div>
           {% if errors and errors.get('password') %}
             <p class="mt-2 text-xs text-rose-300">{{ errors.get('password')[0] }}</p>
@@ -89,14 +83,6 @@
 
 {% block scripts %}
 <script>
-  // Mostrar/ocultar contraseña
-  const toggle = document.getElementById('togglePwd');
-  const pwd = document.getElementById('password');
-  toggle?.addEventListener('click', () => {
-    pwd.type = pwd.type === 'password' ? 'text' : 'password';
-  });
-
-  // Autodesvanecimiento de flashes
   setTimeout(() => {
     document.querySelectorAll('.flash-message').forEach(el => {
       el.classList.add('opacity-0', 'transition', 'duration-700');

@@ -16,7 +16,7 @@
       </div>
       <div class="flex items-center gap-2">
         <a href="#" onclick="openAddUserModal()"
-           class="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-glow">
+           class="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-glow">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
@@ -95,20 +95,26 @@
                 <td class="py-3 px-5 text-slate-300">{{ u.email }}</td>
                 <td class="py-3 px-5">
                   <div class="flex gap-1">
-                    <a href="{{ url_for('admin.update_user', user_id = u.id) }}" title="Editar"
-                       class="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-white/5 ring-1 ring-white/10 text-amber-200 hover:bg-white/10">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                      </svg>
-                    </a>
-                    <a href="{{ url_for('admin.delete_user', user_id = u.id) }}"
-                       onclick="return confirm('¿Seguro que deseas eliminar este usuario?')"
-                       title="Eliminar"
-                       class="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-white/5 ring-1 ring-white/10 text-rose-200 hover:bg-white/10">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12.54 0c-.27.041-.533.09-.79.143m-4.009 0H4.66a48.609 48.609 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.144-2.032-2.144A48.77 48.77 0 0012 3c-2.392 0-4.744.175-7.032.511C3.84 3.68 3 4.644 3 5.828v.916m7.5 0h-7.5" />
-                      </svg>
-                    </a>
+                  <button
+                    type="button"
+                    class="btn-edit-user inline-flex items-center justify-center h-9 w-9 rounded-lg bg-white/5 ring-1 ring-white/10 text-amber-200 hover:bg-white/10"
+                    data-id="{{ u.id }}"
+                    data-usuario="{{ u.usuario|e }}"
+                    data-email="{{ u.email|e }}"
+                    data-is-admin="{{ 1 if u.is_admin else 0 }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-delete-user inline-flex items-center justify-center h-9 w-9 rounded-lg bg-white/5 ring-1 ring-white/10 text-rose-200 hover:bg-white/10"
+                    title="Eliminar"
+                    data-url="{{ url_for('admin.delete_user', user_id=u.id) }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12.54 0c-.27.041-.533.09-.79.143m-4.009 0H4.66a48.609 48.609 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.144-2.032-2.144A48.77 48.77 0 0012 3c-2.392 0-4.744.175-7.032.511C3.84 3.68 3 4.644 3 5.828v.916m7.5 0h-7.5" />
+                    </svg>
+                  </button>
                   </div>
                 </td>
               </tr>
@@ -127,6 +133,38 @@
     </div>
   </div>
 </section>
+
+<div id="confirmDeleteModal" class="fixed inset-0 z-[60] hidden items-center justify-center">
+  <div class="absolute inset-0 bg-slate-900/80 backdrop-blur"></div>
+
+  <div class="relative z-10 w-[95%] max-w-md rounded-2xl bg-slate-950 ring-1 ring-white/10 p-6">
+    <div class="flex items-start gap-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-full bg-rose-500/10 ring-1 ring-rose-500/30 text-rose-300">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10.29 3.86a2 2 0 013.42 0l8.14 14.1A2 2 0 0120.14 21H3.86a2 2 0 01-1.71-3.04l8.14-14.1zM12 9a.75.75 0 00-.75.75v3.5a.75.75 0 001.5 0v-3.5A.75.75 0 0012 9zm0 7a1 1 0 100-2 1 1 0 000 2z"/>
+        </svg>
+      </div>
+      <div class="flex-1">
+        <h3 class="text-lg font-semibold text-slate-100">Eliminar usuario</h3>
+        <p class="mt-1 text-sm text-slate-300">
+          Esta acción no se puede deshacer. ¿Seguro que deseas eliminar este usuario?
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button id="cancelDeleteBtn"
+              class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-white/5 ring-1 ring-white/10 text-slate-200 hover:bg-white/10">
+        Cancelar
+      </button>
+      <button id="confirmDeleteBtn"
+              class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-semibold">
+        Sí, eliminar
+      </button>
+    </div>
+  </div>
+</div>
+
 
 <div id="addUserModal"
      class="fixed inset-0 z-50 hidden items-center justify-center">
@@ -182,8 +220,51 @@
           Cancelar
         </button>
         <button type="submit"
-                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-glow">
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-glow">
           Crear
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<div id="editUserModal" class="fixed inset-0 z-50 hidden items-center justify-center">
+  <div class="absolute inset-0 bg-slate-900/80 backdrop-blur" onclick="closeEditUserModal()"></div>
+  <div class="relative z-10 w-[95%] max-w-md rounded-2xl bg-slate-950 ring-1 ring-white/10 p-6">
+    <h2 class="text-xl font-bold text-slate-100 text-center">Editar usuario</h2>
+    <form id="editUserForm" method="POST" class="mt-5 space-y-5">
+      <div>
+        <label for="edit_usuario" class="block text-sm font-medium text-slate-200 mb-1">Nombre de usuario</label>
+        <input type="text" id="edit_usuario" name="usuario" required
+              class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500focus:border-brand-500">
+      </div>
+      <div>
+        <label for="edit_email" class="block text-sm font-medium text-slate-200 mb-1">Correo electrónico</label>
+        <input type="email" id="edit_email" name="email" required
+              class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500focus:border-brand-500">
+      </div>
+      <div>
+        <label for="edit_password" class="block text-sm font-medium text-slate-200 mb-1">Nueva contraseña <span class="text-slate-400">(opcional)</span></label>
+        <input type="password" id="edit_password" name="password" placeholder="Deja en blanco para no cambiar"
+              class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500focus:border-brand-500">
+      </div>
+      <div>
+        <label for="edit_nivel" class="block text-sm font-medium text-slate-200 mb-1">Rol</label>
+        <select id="edit_nivel" name="nivel" required
+                class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500focus:border-brand-500">
+          <option value="usuario">Usuario</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <button type="button" onclick="closeEditUserModal()"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 ring-1 ring-white/10 text-slate-200 hover:bg-white/10">
+          Cancelar
+        </button>
+        <button type="submit"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold">
+          Guardar cambios
         </button>
       </div>
     </form>
@@ -204,7 +285,7 @@
     addModal.classList.add('hidden');
     addModal.classList.remove('flex');
   }
-  addModal.addEventListener('click', (e) => { if (e.target === addModal) closeAddUserModal(); });
+  addModal?.addEventListener('click', (e) => { if (e.target === addModal) closeAddUserModal(); });
 
   setTimeout(() => {
     document.querySelectorAll('.flash-message-item').forEach(el => {
@@ -212,5 +293,98 @@
       setTimeout(() => el.remove(), 700);
     });
   }, 5000);
+
+  const editModal = document.getElementById('editUserModal');
+  const editForm  = document.getElementById('editUserForm');
+
+  function openEditUserModal(id, usuario, email, is_admin) {
+    editForm.action = "{{ url_for('admin.update_user', user_id=0) }}".replace('/0', `/${id}`);
+
+    document.getElementById('edit_usuario').value  = usuario || '';
+    document.getElementById('edit_email').value    = email || '';
+
+    const passEl = document.getElementById('edit_password');
+    if (passEl) passEl.value = '';
+    const nivelEl = document.getElementById('edit_nivel');
+    if (nivelEl) nivelEl.value = (is_admin ? 'admin' : 'usuario');
+
+    editModal.classList.remove('hidden');
+    editModal.classList.add('flex');
+  }
+
+  function closeEditUserModal() {
+    editModal.classList.add('hidden');
+    editModal.classList.remove('flex');
+  }
+
+  editModal?.addEventListener('click', (e) => { if (e.target === editModal) closeEditUserModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (!addModal.classList.contains('hidden')) closeAddUserModal();
+      if (!editModal.classList.contains('hidden')) closeEditUserModal();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-edit-user');
+    if (!btn) return;
+    const id       = Number(btn.dataset.id);
+    const usuario  = btn.dataset.usuario || '';
+    const email    = btn.dataset.email || '';
+    const isAdmin  = btn.dataset.isAdmin === '1' || btn.dataset.isAdmin === 'true';
+
+    openEditUserModal(id, usuario, email, isAdmin);
+  });
+
+  editForm?.addEventListener('submit', (e) => {
+    const submitBtn = editForm.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Guardando…';
+    }
+  });
+
+  const confirmModal = document.getElementById('confirmDeleteModal');
+  const cancelDelBtn = document.getElementById('cancelDeleteBtn');
+  const confirmDelBtn = document.getElementById('confirmDeleteBtn');
+  let pendingDeleteUrl = null;
+
+  const openConfirm = (url) => {
+    pendingDeleteUrl = url;
+    confirmModal.classList.remove('hidden');
+    confirmModal.classList.add('flex');
+  };
+
+  const closeConfirm = () => {
+    confirmModal.classList.add('hidden');
+    confirmModal.classList.remove('flex');
+    pendingDeleteUrl = null;
+  };
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-delete-user');
+    if (!btn) return;
+    e.preventDefault();
+    openConfirm(btn.dataset.url);
+  });
+
+  cancelDelBtn?.addEventListener('click', closeConfirm);
+  confirmModal?.addEventListener('click', (e) => {
+    if (e.target === confirmModal) closeConfirm();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !confirmModal.classList.contains('hidden')) closeConfirm();
+  });
+
+  confirmDelBtn?.addEventListener('click', () => {
+    if (!pendingDeleteUrl) return;
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = pendingDeleteUrl;
+    document.body.appendChild(form);
+    form.submit();
+  });
+
 </script>
+
 {% endblock %}

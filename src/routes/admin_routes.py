@@ -47,13 +47,19 @@ def admin_dashboard():
 @admin_required
 def view_users():
     cursor = mysql.connection.cursor()
-    cursor.execute('SELECT id, usuario, email FROM usuarios ORDER BY fecha_registro ASC')
+    cursor.execute("""
+        SELECT u.id, u.usuario, u.email,
+               CASE WHEN a.id IS NULL THEN 0 ELSE 1 END AS is_admin
+        FROM usuarios u
+        LEFT JOIN administradores a ON a.usuario_id = u.id
+        ORDER BY u.fecha_registro ASC
+    """)
     users = cursor.fetchall()
     cursor.close()
     return render_template('admin/view_user.html', users = users)
 
 # Funcionalidad para eliminar usuarios según ID registrado en la base de datos
-@admin_bp.route('/delete/<int:user_id>')
+@admin_bp.route('/delete/<int:user_id>', methods = ['POST'])
 @login_required
 @admin_required
 def delete_user(user_id):
@@ -65,24 +71,57 @@ def delete_user(user_id):
     return redirect(url_for('admin.view_users'))
 
 # Funcionalidad para modificar datos de usuario según ID registrada en la base de datos
-@admin_bp.route('/update/<int:user_id>', methods = ['GET', 'POST'])
+@admin_bp.route('/update/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def update_user(user_id):
     cursor = mysql.connection.cursor()
+
     if request.method == 'POST':
-        user = request.form['usuario']
-        email = request.form['email']
-        cursor.execute('UPDATE usuarios SET usuario = %s, email = %s WHERE id = %s', (user, email, user_id))
+        usuario  = (request.form.get('usuario') or '').strip()
+        email    = (request.form.get('email') or '').strip()
+        password = (request.form.get('password') or '').strip()
+        nivel    = (request.form.get('nivel') or 'usuario').strip().lower()
+
+        if not usuario or not email:
+            cursor.close()
+            flash('Usuario y correo son obligatorios.', 'update_error')
+            return redirect(url_for('admin.view_users'))
+
+        if password:
+            hashed = generate_password_hash(password)
+            cursor.execute("""
+                UPDATE usuarios
+                SET usuario=%s, email=%s, password_bcrypt=%s
+                WHERE id=%s
+            """, (usuario, email, hashed, user_id))
+        else:
+            cursor.execute("""
+                UPDATE usuarios
+                SET usuario=%s, email=%s
+                WHERE id=%s
+            """, (usuario, email, user_id))
+
+        cursor.execute("SELECT id FROM administradores WHERE usuario_id=%s", (user_id,))
+        admin_row = cursor.fetchone()
+
+        if nivel == 'admin' and not admin_row:
+            cursor.execute("""
+                INSERT INTO administradores (usuario_id, nivel_acceso)
+                VALUES (%s, %s)
+            """, (user_id, 'admin'))
+        elif nivel != 'admin' and admin_row:
+            cursor.execute("DELETE FROM administradores WHERE usuario_id=%s", (user_id,))
+
         mysql.connection.commit()
         cursor.close()
-        flash('Usuario actualizado correctamente', 'update_success')
+
+        flash('Usuario actualizado correctamente.', 'update_success')
         return redirect(url_for('admin.view_users'))
-    else:
-        cursor.execute('SELECT id, usuario, email FROM usuarios WHERE id = %s', (user_id,))
-        user = cursor.fetchone()
-        cursor.close()
-        return render_template('admin/update_user.html', user = user)
+
+    cursor.close()
+    return redirect(url_for('admin.view_users'))
+
 
 # Funcionalidad para crear un usuario desde panel de administrador
 @admin_bp.route('/add', methods = ['POST'])

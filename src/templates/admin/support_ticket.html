@@ -107,7 +107,6 @@
         </section>
 
         {% if ticket.estado != 'cerrado' %}
-          <!-- Respuesta -->
           <section class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-5">
             <h3 class="text-lg font-semibold text-slate-100 mb-3">Responder como soporte</h3>
             <form action="{{ url_for('admin.support_ticket_reply', ticket_id=ticket.id) }}" method="post" id="replyForm" class="space-y-4">

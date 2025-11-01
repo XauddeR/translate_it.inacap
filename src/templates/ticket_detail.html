@@ -9,8 +9,6 @@
   </div>
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-14">
-
-    <!-- Back link + header -->
     <a href="{{ url_for('support.support_home') }}" class="text-sm text-brand-300 hover:text-brand-200">&larr; Volver a Soporte</a>
     <div class="mt-3">
       <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">{{ ticket.asunto }}</h1>
@@ -73,7 +71,6 @@
       </div>
     </section>
 
-    <!-- Responder -->
     {% if ticket.estado not in ['resuelto', 'cerrado'] %}
       <section class="mt-6 rounded-2xl bg-white/5 ring-1 ring-white/10 p-6">
         <h3 class="text-lg font-semibold mb-4">Responder</h3>
@@ -115,7 +112,6 @@
 
 {% block scripts %}
 <script>
-  // Autodesvanecer flashes
   setTimeout(() => {
     document.querySelectorAll('.flash-message').forEach(el => {
       el.classList.add('opacity-0', 'transition', 'duration-700');
@@ -123,7 +119,6 @@
     });
   }, 5000);
 
-  // Estado "Enviando…" en envío de respuesta
   (function () {
     const form = document.getElementById('replyForm');
     const btn  = document.getElementById('replyBtn');

@@ -9,7 +9,6 @@
   </div>
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-14">
-    <!-- Encabezado + toggle aside mobile -->
     <div class="flex items-center justify-between gap-4 mb-6">
       <div class="min-w-0">
         <a href="{{ url_for('main.history') }}" class="text-sm text-brand-300 hover:text-brand-200">&larr; Volver al historial</a>
@@ -18,9 +17,6 @@
           {{ archivo.nombre_archivo if archivo.nombre_archivo else archivo.filename }}
         </h1>
       </div>
-      <button id="toggleSidebar" class="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 ring-1 ring-white/10 hover:bg-white/10" aria-label="Abrir menú lateral">
-        ☰
-      </button>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
@@ -135,17 +131,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-  // Sidebar mobile
-  (function () {
-    const openBtn = document.getElementById('toggleSidebar');
-    const sheet = document.getElementById('sidebarSheet');
-    const closeBtn = document.getElementById('closeSidebar');
-    const open = () => sheet?.classList.remove('hidden');
-    const close = () => sheet?.classList.add('hidden');
-    openBtn?.addEventListener('click', open);
-    closeBtn?.addEventListener('click', close);
-    sheet?.addEventListener('click', (e) => { if (e.target === sheet) close(); });
-  })();
-</script>
+
 {% endblock %}
