@@ -31,7 +31,7 @@ def create_user(usuario, email, password):
         cursor = mysql.connection.cursor()
         hashed_password = generate_password_hash(password)
         sql = '''
-            INSERT INTO USUARIOS (USUARIO, EMAIL, PASSWORD_BCRYPT)
+            INSERT INTO usuarios (usuario, email, password_bcrypt)
             VALUES (%s, %s, %s)
         '''
         cursor.execute(sql, (usuario, email, hashed_password))

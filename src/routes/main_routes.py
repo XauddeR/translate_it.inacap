@@ -20,7 +20,7 @@ def dashboard():
 @login_required
 def history():
     cursor = mysql.connection.cursor()
-    cursor.execute('SELECT * FROM ARCHIVOS WHERE USUARIO_ID = %s ORDER BY FECHA_SUBIDA DESC', (current_user.id,))
+    cursor.execute('SELECT * FROM archivos WHERE usuario_id = %s ORDER BY fecha_subida DESC', (current_user.id,))
     archivos = cursor.fetchall()
     cursor.close()
 
@@ -30,7 +30,7 @@ def history():
 @login_required
 def file_detail(archivo_id):
     cursor = mysql.connection.cursor()
-    cursor.execute('SELECT * FROM ARCHIVOS WHERE id = %s', (archivo_id,))
+    cursor.execute('SELECT * FROM archivos WHERE id = %s', (archivo_id,))
     archivo = cursor.fetchone()
     cursor.close()
 

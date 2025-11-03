@@ -12,7 +12,7 @@ def login():
         email = request.form['email']
         password = request.form['password']
         cursor = mysql.connection.cursor()
-        cursor.execute('SELECT * FROM USUARIOS WHERE EMAIL = %s', (email,))
+        cursor.execute('SELECT * FROM usuarios WHERE email = %s', (email,))
         user = cursor.fetchone()
         cursor.close()
 
