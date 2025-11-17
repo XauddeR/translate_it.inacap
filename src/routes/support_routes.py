@@ -18,7 +18,7 @@ def support_home():
     cursor.close()
     return render_template('support.html', tickets = tickets)
 
-@support_bp.route('/crear', methods=['POST'])
+@support_bp.route('/create', methods=['POST'])
 @login_required
 def create_ticket():
     asunto = request.form.get('subject', '').strip()
@@ -69,7 +69,7 @@ def view_ticket(ticket_id):
     cursor.close()
     return render_template('ticket_detail.html', ticket = t, mensajes = mensajes)
 
-@support_bp.route('/t/<int:ticket_id>/responder', methods = ['POST'])
+@support_bp.route('/t/<int:ticket_id>/answer', methods = ['POST'])
 @login_required
 def reply_ticket(ticket_id):
     texto = request.form.get('message', '').strip()

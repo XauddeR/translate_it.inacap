@@ -16,7 +16,7 @@ def index():
 def dashboard():
     return render_template('dashboard.html', user = current_user)
 
-@main_bp.route('/historial')
+@main_bp.route('/history')
 @login_required
 def history():
     cursor = mysql.connection.cursor()
@@ -26,7 +26,7 @@ def history():
 
     return render_template('history.html', archivos = archivos)
 
-@main_bp.route('/archivo/<archivo_id>')
+@main_bp.route('/file/<archivo_id>')
 @login_required
 def file_detail(archivo_id):
     cursor = mysql.connection.cursor()
@@ -53,7 +53,7 @@ def file_video(filename):
 
     return send_from_directory(upload_folder, safe_filename, as_attachment = False)
 
-@main_bp.route('/archivo/thumbnail/<filename>')
+@main_bp.route('/file/thumbnail/<filename>')
 @login_required
 def file_thumbnail(filename):
     safe_filename = secure_filename(filename)
