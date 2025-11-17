@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from services.deepl_api import translate_text
 from services.transcription import audio_transcription
 from utils.video_proccess import audio_extract, convert_mp4, create_thumbnail
+from utils.languages_dao import get_lang
 from utils.extensions import mysql
 from pathlib import Path
 
@@ -18,6 +19,8 @@ def allowed_file(filename):
 @upload_bp.route('/', methods = ['GET', 'POST'])
 @login_required
 def upload_file():
+    langs = get_lang(active_only = True)
+
     if request.method == 'POST':
         if 'video' not in request.files:
             flash('No se encontró ningún archivo', 'upload_error')
@@ -26,6 +29,12 @@ def upload_file():
         language = request.form.get('language')
         file = request.files['video']
 
+        valid_codes = {i['codigo'].upper() for i in get_lang(activos_only = True)}
+
+        if language is None or language.upper() not in valid_codes:
+            flash("El idioma seleccionado no está disponible.", "upload_error")
+            return redirect(request.url)
+        
         if file.filename == '':
             flash('No seleccionaste ningún archivo', 'upload_error')
             return redirect(request.url)
@@ -80,7 +89,6 @@ def upload_file():
                 mysql.connection.commit()
                 cursor.close()
 
-                flash(f'Video subido exitosamente.', 'upload_success')
                 return redirect(url_for('main.history'))
             
             except Exception as e:
@@ -90,4 +98,4 @@ def upload_file():
             flash('Formato no permitido. Usa mp4, avi, mov o mkv.', 'upload_error')
             return redirect(request.url)
 
-    return render_template('upload.html')
+    return render_template('upload.html', langs = langs)

@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 from functools import wraps
+from utils.languages_dao import get_lang, add_lang, delete_lang, enable_lang, disable_lang
 from utils.extensions import mysql
 
 admin_bp = Blueprint('admin', __name__)
@@ -83,48 +84,48 @@ def update_user(user_id):
         password = (request.form.get('password') or '').strip()
         nivel    = (request.form.get('nivel') or 'usuario').strip().lower()
 
-        if not usuario or not email:
+        try:
+            if not usuario or not email:
+                cur.close()
+                flash('Usuario y correo son obligatorios.', 'update_error')
+                return redirect(url_for('admin.view_users'))
+
+            if password:
+                hashed = generate_password_hash(password)
+                cur.execute('''
+                    UPDATE usuarios
+                    SET usuario = %s, email = %s, password_bcrypt = %s
+                    WHERE id = %s
+                ''', (usuario, email, hashed, user_id))
+            else:
+                cur.execute('''
+                    UPDATE usuarios
+                    SET usuario=%s, email=%s
+                    WHERE id=%s
+                ''', (usuario, email, user_id))
+
+            cur.execute('SELECT id FROM administradores WHERE usuario_id = %s', (user_id,))
+            admin_row = cur.fetchone()
+
+            if nivel == 'admin' and not admin_row:
+                cur.execute('''
+                    INSERT INTO administradores (usuario_id, nivel_acceso)
+                    VALUES (%s, %s)
+                ''', (user_id, 'admin'))
+            elif nivel != 'admin' and admin_row:
+                cur.execute('DELETE FROM administradores WHERE usuario_id = %s', (user_id,))
+
+            mysql.connection.commit()
             cur.close()
-            flash('Usuario y correo son obligatorios.', 'update_error')
+
+            flash('Usuario actualizado correctamente.', 'update_success')
             return redirect(url_for('admin.view_users'))
-
-        if password:
-            hashed = generate_password_hash(password)
-            cur.execute('''
-                UPDATE usuarios
-                SET usuario = %s, email = %s, password_bcrypt = %s
-                WHERE id = %s
-            ''', (usuario, email, hashed, user_id))
-        else:
-            cur.execute('''
-                UPDATE usuarios
-                SET usuario=%s, email=%s
-                WHERE id=%s
-            ''', (usuario, email, user_id))
-
-        cur.execute('SELECT id FROM administradores WHERE usuario_id = %s', (user_id,))
-        admin_row = cur.fetchone()
-
-        if nivel == 'admin' and not admin_row:
-            cur.execute('''
-                INSERT INTO administradores (usuario_id, nivel_acceso)
-                VALUES (%s, %s)
-            ''', (user_id, 'admin'))
-        elif nivel != 'admin' and admin_row:
-            cur.execute('DELETE FROM administradores WHERE usuario_id = %s', (user_id,))
-
-        mysql.connection.commit()
-        cur.close()
-
-        flash('Usuario actualizado correctamente.', 'update_success')
-        return redirect(url_for('admin.view_users'))
-
-    cur.close()
+        except Exception as e:
+            flash(f'Error al crear usuario: {str(e)}', 'update_error')
     return redirect(url_for('admin.view_users'))
 
-
 # Funcionalidad para crear un usuario desde panel de administrador
-@admin_bp.route('/add', methods = ['POST'])
+@admin_bp.route('/add-user', methods = ['POST'])
 @login_required
 @admin_required
 def add_user():
@@ -229,7 +230,7 @@ def support_ticket_detail(ticket_id):
 
     return render_template('admin/support_ticket.html', ticket = ticket, mensajes = mensajes)
 
-@admin_bp.post('/support/tickets/<int:ticket_id>/reply', endpoint='support_ticket_reply')
+@admin_bp.post('/support/tickets/<int:ticket_id>/reply', endpoint = 'support_ticket_reply')
 @admin_required
 def support_ticket_reply(ticket_id):
     mensaje = (request.form.get('message') or '').strip()
@@ -297,4 +298,48 @@ def support_ticket_set_status(ticket_id):
     cur.close()
 
     flash(f'Estado actualizado a {estado}.', 'success')
-    return redirect(url_for('admin.support_ticket_detail', ticket_id=ticket_id))
+    return redirect(url_for('admin.support_ticket_detail', ticket_id = ticket_id))
+
+@admin_bp.route('/languages', methods = ['GET'])
+@login_required
+@admin_required
+def languages_list():
+    languages = get_lang()
+    return render_template('admin/languages_list.html', languages = languages)
+
+@admin_bp.route('/add-language', methods = ['POST'])
+@login_required
+@admin_required
+def create_language():
+    name = request.form.get('name').strip()
+    code = request.form.get('code').strip().upper()
+    if not name or not code:
+        flash('Nombre y código son obligatorios', 'language_error')
+        return redirect(url_for('admin.languages_list'))
+    try:
+        add_lang(name, code)
+        flash('Idioma agregado correctamente', 'language_success')
+    except Exception as e:
+        print(f'Error: {e}')
+    return redirect(url_for('admin.languages_list'))
+
+@admin_bp.route('/languages/<int:idioma_id>/toggle', methods = ['POST'])
+@login_required
+@admin_required
+def toggle_lang(idioma_id):
+    action = request.form.get('accion')
+    if action == 'disable':
+        disable_lang(idioma_id)
+        flash('Idioma deshabilitado', 'able_warning')
+    elif action == 'enable':
+        enable_lang(idioma_id)
+        flash('Idioma habilitado', 'able_success')
+    return redirect(url_for('admin.languages_list'))
+
+@admin_bp.route('/languages/<int:idioma_id>/delete', methods = ['POST'])
+@login_required
+@admin_required
+def delete_lang(idioma_id):
+    delete_lang(idioma_id)
+    flash('Idioma eliminado', 'success')
+    return redirect(url_for('admin.languages_list'))

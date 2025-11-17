@@ -17,7 +17,7 @@
         <p class="mt-1 text-slate-300">Gestiona cuentas, roles y acceso a Translate It.</p>
       </div>
       <div class="flex items-center gap-2">
-        <a href="#" onclick="openAddUserModal()"
+        <a onclick="openAddUserModal()"
            class="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-glow">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -54,7 +54,16 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9.88 7.52c1.17-1.02 3.07-1.02 4.24 0 1.17 1.02 1.17 2.69 0 3.71-.2.18-.43.33-.67.44-.75.36-1.45 1-1.45 1.83v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/>
                 </svg>
-                Soporte
+                Tickets
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('admin.languages_list') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:ring-1 hover:ring-white/10 text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M5 4h14a1 1 0 0 1 1 1v3.5a1 1 0 0 1-1.447.894L16 8.118l-3.553 1.276A1 1 0 0 1 11 8.5V5H6v14h5a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm9 7h2a1 1 0 0 1 .894.553l3 6A1 1 0 0 1 19 19h-1.382l-.894 1.789a1 1 0 0 1-1.788 0L14.043 19H13a1 1 0 0 1-.894-1.447l3-6A1 1 0 0 1 14 11zm1 5.382L15.618 15h-.236L15 16.382z"/>
+                </svg>
+                Idiomas
               </a>
             </li>
           </ul>
@@ -266,6 +275,16 @@
           <option value="usuario">Usuario</option>
           <option value="admin">Administrador</option>
         </select>
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <button type="button" onclick="closeEditUserModal()"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 ring-1 ring-white/10 text-slate-200 hover:bg-white/10">
+          Cancelar
+        </button>
+        <button type="submit"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-glow">
+          Guardar
+        </button>
       </div>
     </form>
   </div>

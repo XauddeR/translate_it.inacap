@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% from "_forms.html" import csrf %}
+
+{% block title %}Idiomas — Translate It{% endblock %}
+
+{% block content %}
+<section class="relative">
+  <div class="absolute inset-0 -z-10">
+    <div class="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] rounded-full blur-3xl opacity-30"
+         style="background: radial-gradient(closest-side, rgba(59,130,246,.35), rgba(29,78,216,.25), transparent 70%);"></div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-14">
+    <div class="flex items-center justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Idiomas disponibles</h1>
+        <p class="mt-1 text-slate-300">
+          Administra los idiomas que los usuarios pueden seleccionar en Translate It.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-[260px,1fr] gap-6">
+      <aside class="md:sticky md:top-24 md:self-start rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 md:p-5 md:block">
+        <nav>
+          <ul class="space-y-1 text-sm">
+            <li>
+              <a href="{{ url_for('admin.admin_dashboard') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:ring-1 hover:ring-white/10 text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-width="1.7" d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17"/></svg>
+                Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('admin.view_users') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:ring-1 hover:ring-white/10 text-slate-300">
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                  <path d="M 12 4 A 4 4 0 1 1 12 12 A 4 4 0 1 1 12 4 Z M 4 20 C 4 15 8 13 12 13 C 16 13 20 15 20 20 Z" />
+                </svg>
+                Usuarios
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('admin.support_list') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:ring-1 hover:ring-white/10 text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.88 7.52c1.17-1.02 3.07-1.02 4.24 0 1.17 1.02 1.17 2.69 0 3.71-.2.18-.43.33-.67.44-.75.36-1.45 1-1.45 1.83v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/>
+                </svg>
+                Tickets
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('admin.languages_list') }}"
+                 class="flex items-center gap-3 px-3 py-2 rounded-lg bg-brand-600/20 text-brand-200 ring-1 ring-brand-500/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M5 4h14a1 1 0 0 1 1 1v3.5a1 1 0 0 1-1.447.894L16 8.118l-3.553 1.276A1 1 0 0 1 11 8.5V5H6v14h5a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm9 7h2a1 1 0 0 1 .894.553l3 6A1 1 0 0 1 19 19h-1.382l-.894 1.789a1 1 0 0 1-1.788 0L14.043 19H13a1 1 0 0 1-.894-1.447l3-6A1 1 0 0 1 14 11zm1 5.382L15.618 15h-.236L15 16.382z"/>
+                </svg>
+                Idiomas
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="space-y-6">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div id="languagesFlashContainer" class="mb-2 space-y-2">
+              {% for category, message in messages %}
+                <div class="flash-message-item rounded-xl px-4 py-3 text-sm
+                            {% if 'success' in category %} bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30
+                            {% elif 'error' in category or 'danger' in category %} bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30
+                            {% else %} bg-white/5 text-slate-200 ring-1 ring-white/10 {% endif %}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div id="add-language-form"
+             class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 md:p-5 space-y-4">
+          <h2 class="text-lg font-semibold text-slate-100">Agregar nuevo idioma</h2>
+          <form method="POST" action="{{ url_for('admin.create_language') }}" class="grid grid-cols-1 md:grid-cols-[2fr,1fr,auto] gap-3">
+            {{ csrf() }}
+            <div>
+              <label for="name" class="block text-xs font-medium text-slate-300 mb-1">Nombre</label>
+              <input id="name" name="name" placeholder="Nombre (Ej: Español)" required
+                     class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-3 py-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+            </div>
+            <div>
+              <label for="code" class="block text-xs font-medium text-slate-300 mb-1">Código</label>
+              <input id="code" name="code" placeholder="Ej: ES" required
+                     class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-3 py-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+            </div>
+            <div class="flex items-end">
+              <button
+                class="inline-flex items-center justify-center w-full md:w-auto px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-glow">
+                Agregar
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-white/5 ring-1 ring-white/10">
+              <tr class="text-left text-slate-300">
+                <th class="py-3.5 px-5 font-semibold">ID</th>
+                <th class="py-3.5 px-5 font-semibold">Nombre</th>
+                <th class="py-3.5 px-5 font-semibold">Código</th>
+                <th class="py-3.5 px-5 font-semibold">Estado</th>
+                <th class="py-3.5 px-5 font-semibold">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for i in languages %}
+              <tr class="border-t border-white/10 hover:bg-white/5">
+                <td class="py-3 px-5 text-slate-200">{{ i.id }}</td>
+                <td class="py-3 px-5 text-slate-200">{{ i.nombre }}</td>
+                <td class="py-3 px-5 text-slate-300">{{ i.codigo }}</td>
+                <td class="py-3 px-5">
+                  {% if i.habilitado %}
+                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-200 ring-1 ring-emerald-500/30">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                      Habilitado
+                    </span>
+                  {% else %}
+                    <span class="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-1 text-xs font-medium text-rose-200 ring-1 ring-rose-500/30">
+                      <span class="h-1.5 w-1.5 rounded-full bg-rose-400"></span>
+                      Deshabilitado
+                    </span>
+                  {% endif %}
+                </td>
+                <td class="py-3 px-5">
+                  <div class="flex flex-wrap gap-2">
+                    <form method="POST" action="{{ url_for('admin.toggle_lang', idioma_id=i.id) }}">
+                      {{ csrf() }}
+                      {% if i.habilitado %}
+                        <input type="hidden" name="accion" value="disable">
+                        <button
+                          class="inline-flex items-center justify-center h-9 px-3 rounded-lg bg-amber-500/20 text-amber-200 ring-1 ring-amber-400/40 hover:bg-amber-500/30 text-xs font-medium">
+                          Deshabilitar
+                        </button>
+                      {% else %}
+                        <input type="hidden" name="accion" value="enable">
+                        <button
+                          class="inline-flex items-center justify-center h-9 px-3 rounded-lg bg-emerald-500/20 text-emerald-200 ring-1 ring-emerald-400/40 hover:bg-emerald-500/30 text-xs font-medium">
+                          Habilitar
+                        </button>
+                      {% endif %}
+                    </form>
+                    <!-- <form method="POST"
+                          action="{{ url_for('admin.delete_lang', idioma_id=i.id) }}"
+                          onsubmit="return confirm('¿Eliminar idioma definitivamente?');">
+                      {{ csrf() }}
+                      <button
+                        class="inline-flex items-center justify-center h-9 px-3 rounded-lg bg-rose-600/80 hover:bg-rose-500 text-white text-xs font-medium">
+                        Eliminar
+                      </button>
+                    </form> -->
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+              {% if languages|length == 0 %}
+              <tr>
+                <td colspan="5" class="py-4 px-5 text-sm text-slate-400">
+                  No hay idiomas configurados todavía. Agrega uno con el formulario superior.
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  setTimeout(() => {
+    document.querySelectorAll('.flash-message-item').forEach(el => {
+      el.classList.add('opacity-0','transition','duration-700');
+      setTimeout(() => el.remove(), 700);
+    });
+  }, 5000);
+</script>
+{% endblock %}
