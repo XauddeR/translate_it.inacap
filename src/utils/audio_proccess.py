@@ -21,6 +21,6 @@ def audio_wav(input_path: str, target_sr: int = 16000) -> str:
         if input_path.suffix.lower() != '.wav' and input_path.exists():
             os.remove(input_path)
     except Exception as e:
-        print(f"⚠️ No se pudo eliminar el archivo original: {e}")
+        print(f'No se pudo eliminar el archivo original: {e}')
 
     return str(output_path)
