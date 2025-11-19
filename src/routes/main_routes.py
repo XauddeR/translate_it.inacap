@@ -65,7 +65,6 @@ def file_thumbnail(filename):
 
     return send_from_directory(thumbnail_folder, safe_filename, as_attachment = False)
 
-
 @main_bp.route('/update_file/<archivo_id>', methods=['POST'])
 @login_required
 def update_file(archivo_id):

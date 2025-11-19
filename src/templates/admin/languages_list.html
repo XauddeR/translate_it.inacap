@@ -17,6 +17,7 @@
         <p class="mt-1 text-slate-300">
           Administra los idiomas que los usuarios pueden seleccionar en Translate It.
         </p>
+        <p class="text-slate-500">Para más información acerca de los idiomas disponibles visita los <a class="italic text-blue-500" target="_blank" href="https://developers.deepl.com/docs/getting-started/supported-languages">idiomas disponibles</a></p>
       </div>
     </div>
 
@@ -85,8 +86,8 @@
           <form method="POST" action="{{ url_for('admin.create_language') }}" class="grid grid-cols-1 md:grid-cols-[2fr,1fr,auto] gap-3">
             {{ csrf() }}
             <div>
-              <label for="name" class="block text-xs font-medium text-slate-300 mb-1">Nombre</label>
-              <input id="name" name="name" placeholder="Nombre (Ej: Español)" required
+              <label for="name" class="block text-xs font-medium text-slate-300 mb-1">Idioma</label>
+              <input id="name" name="name" placeholder="Idioma (Ej: Español)" required
                      class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-3 py-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
             </div>
             <div>
@@ -108,7 +109,7 @@
             <thead class="bg-white/5 ring-1 ring-white/10">
               <tr class="text-left text-slate-300">
                 <th class="py-3.5 px-5 font-semibold">ID</th>
-                <th class="py-3.5 px-5 font-semibold">Nombre</th>
+                <th class="py-3.5 px-5 font-semibold">Idioma</th>
                 <th class="py-3.5 px-5 font-semibold">Código</th>
                 <th class="py-3.5 px-5 font-semibold">Estado</th>
                 <th class="py-3.5 px-5 font-semibold">Acciones</th>
