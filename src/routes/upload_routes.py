@@ -29,7 +29,7 @@ def upload_file():
         language = request.form.get('language')
         file = request.files['video']
 
-        valid_codes = {i['codigo'].upper() for i in get_lang(activos_only = True)}
+        valid_codes = {i['codigo'].upper() for i in get_lang(active_only = True)}
 
         if language is None or language.upper() not in valid_codes:
             flash("El idioma seleccionado no está disponible.", "upload_error")
@@ -83,7 +83,7 @@ def upload_file():
                         db_audio_path, 
                         transcription, 
                         translation, 
-                        language
+                        language.upper()
                     )
                 )
                 mysql.connection.commit()

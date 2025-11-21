@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_forms.html" import csrf %}
 {% block title %}Historial de archivos — Translate It{% endblock %}
 
 {% block content %}
@@ -96,15 +97,14 @@
                     </svg>
                   </button>
 
-                  <form method="POST" action="{{ url_for('main.delete_file', archivo_id=archivo.id) }}"
-                        onsubmit="return confirm('¿Seguro que deseas eliminar este archivo?')">
-                    <button type="submit" title="Eliminar"
-                            class="inline-flex items-center justify-center h-10 w-10 rounded-lg bg-white/5 ring-1 ring-white/10 text-rose-200 hover:bg-white/10">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12.54 0c-.27.041-.533.09-.79.143m-4.009 0H4.66a48.609 48.609 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.144-2.032-2.144A48.77 48.77 0 0012 3c-2.392 0-4.744.175-7.032.511C3.84 3.68 3 4.644 3 5.828v.916m7.5 0h-7.5" />
-                      </svg>
-                    </button>
-                  </form>
+                  <button type="button"
+                          class="btn-delete-file inline-flex items-center justify-center h-10 w-10 rounded-lg bg-white/5 ring-1 ring-white/10 text-rose-200 hover:bg-white/10"
+                          title="Eliminar"
+                          data-url="{{ url_for('main.delete_file', archivo_id=archivo.id) }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12.54 0c-.27.041-.533.09-.79.143m-4.009 0H4.66a48.609 48.609 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.144-2.032-2.144A48.77 48.77 0 0012 3c-2.392 0-4.744.175-7.032.511C3.84 3.68 3 4.644 3 5.828v.916m7.5 0h-7.5" />
+                    </svg>
+                  </button>
                 </div>
               </div>
             {% endfor %}
@@ -128,14 +128,15 @@
   <div class="relative z-10 w-[95%] max-w-md rounded-2xl bg-slate-950 ring-1 ring-white/10 p-6">
     <h2 class="text-xl font-bold text-slate-100">Editar título</h2>
     <form id="editForm" method="POST" class="mt-5 space-y-5">
+      {{ csrf() }}
       <div>
         <label for="editFilename" class="block text-sm font-medium text-slate-200 mb-1">Nuevo nombre del archivo</label>
         <input type="text" id="editFilename" name="filename" required
                class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
       </div>
       <div class="flex justify-end gap-3">
-        <button type="button" onclick="closeEditModal()"
-                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 ring-1 ring-white/10 text-slate-200 hover:bg-white/10">
+        <button type="button" onclick="closeEditModal()
+                " class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 ring-1 ring-white/10 text-slate-200 hover:bg-white/10">
           Cancelar
         </button>
         <button type="submit"
@@ -146,20 +147,100 @@
     </form>
   </div>
 </div>
+
+<div id="confirmDeleteModal" class="fixed inset-0 z-[60] hidden items-center justify-center">
+  <div id="confirmOverlay" class="absolute inset-0 bg-slate-900/80 backdrop-blur"></div>
+
+  <div class="relative z-10 w-[95%] max-w-md rounded-2xl bg-slate-950 ring-1 ring-white/10 p-6">
+    <div class="flex items-start gap-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-full bg-rose-500/10 ring-1 ring-rose-500/30 text-rose-300">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10.29 3.86a2 2 0 013.42 0l8.14 14.1A2 2 0 0120.14 21H3.86a2 2 0 01-1.71-3.04l8.14-14.1zM12 9a.75.75 0 00-.75.75v3.5a.75.75 0 001.5 0v-3.5A.75.75 0 0012 9zm0 7a1 1 0 100-2 1 1 0 000 2z"/>
+        </svg>
+      </div>
+      <div class="flex-1">
+        <h3 class="text-lg font-semibold text-slate-100">Eliminar archivo</h3>
+        <p class="mt-1 text-sm text-slate-300">
+          Esta acción no se puede deshacer. ¿Seguro que deseas eliminar este archivo de tu historial?
+        </p>
+      </div>
+    </div>
+
+    <form id="deleteFileForm" method="POST" class="mt-6 flex justify-end gap-3">
+      {{ csrf() }}
+      <button type="button" id="cancelDeleteBtn"
+              class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-white/5 ring-1 ring-white/10 text-slate-200 hover:bg-white/10">
+        Cancelar
+      </button>
+      <button type="submit" id="confirmDeleteBtn"
+              class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-semibold">
+        Sí, eliminar
+      </button>
+    </form>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-  const modal = document.getElementById('editModal');
+  const editModal = document.getElementById('editModal');
+  const editForm  = document.getElementById('editForm');
+
   function openEditModal(id, filename) {
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
+    editModal.classList.remove('hidden');
+    editModal.classList.add('flex');
     document.getElementById('editFilename').value = filename;
-    document.getElementById('editForm').action = `/update_file/${id}`;
+    editForm.action = `/update_file/${id}`;
   }
+
   function closeEditModal() {
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
+    editModal.classList.add('hidden');
+    editModal.classList.remove('flex');
   }
+
+  editModal?.addEventListener('click', (e) => {
+    if (e.target === editModal) closeEditModal();
+  });
+
+  const confirmModal = document.getElementById('confirmDeleteModal');
+  const confirmOverlay = document.getElementById('confirmOverlay');
+  const cancelDelBtn = document.getElementById('cancelDeleteBtn');
+  const delForm = document.getElementById('deleteFileForm');
+
+  function openConfirm(url) {
+    delForm.action = url;
+    confirmModal.classList.remove('hidden');
+    confirmModal.classList.add('flex');
+  }
+
+  function closeConfirm() {
+    confirmModal.classList.add('hidden');
+    confirmModal.classList.remove('flex');
+    delForm.action = '';
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-delete-file');
+    if (!btn) return;
+    e.preventDefault();
+    openConfirm(btn.dataset.url);
+  });
+
+  cancelDelBtn?.addEventListener('click', closeConfirm);
+  confirmOverlay?.addEventListener('click', closeConfirm);
+
+  delForm?.addEventListener('submit', () => {
+    const btn = delForm.querySelector('button[type="submit"]');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Eliminando…';
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (editModal && !editModal.classList.contains('hidden'))  closeEditModal();
+    if (confirmModal && !confirmModal.classList.contains('hidden')) closeConfirm();
+  });
 </script>
 {% endblock %}

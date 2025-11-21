@@ -30,12 +30,32 @@ def history():
 @login_required
 def file_detail(archivo_id):
     cursor = mysql.connection.cursor()
-    cursor.execute('SELECT * FROM archivos WHERE id = %s', (archivo_id,))
+    cursor.execute('''
+        SELECT 
+            a.id,
+            a.usuario_id,
+            a.filename,
+            a.nombre_archivo,
+            a.miniatura_archivo,
+            a.ruta_video,
+            a.ruta_audio,
+            a.transcripcion,
+            a.traduccion,
+            a.idioma_destino,
+            a.fecha_subida,
+            i.nombre AS idioma_nombre
+        FROM archivos a
+        LEFT JOIN idiomas i
+          ON a.idioma_destino = i.codigo
+        WHERE a.id = %s AND a.usuario_id = %s
+        LIMIT 1
+    ''', (archivo_id, current_user.id))
     archivo = cursor.fetchone()
     cursor.close()
 
     if not archivo:
         abort(404)
+
     if archivo['usuario_id'] != current_user.id:
         abort(403)
 

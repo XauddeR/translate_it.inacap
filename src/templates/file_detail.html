@@ -97,7 +97,7 @@
 
             <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 flex flex-col">
               <h2 class="text-xl font-semibold">
-                Traducción <span class="text-slate-400 text-sm">({{ archivo.idioma_destino }})</span>
+                Traducción <span class="text-slate-400 text-sm">{{ archivo.idioma_nombre }}</span>
               </h2>
               <div class="mt-4 max-h-72 overflow-y-auto rounded-lg bg-brand-900/20 ring-1 ring-brand-500/30 p-4">
                 <p class="text-slate-100 whitespace-pre-line text-sm leading-relaxed">{{ archivo.traduccion }}</p>
@@ -120,7 +120,7 @@
           <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
             <div><dt class="text-slate-400">Nombre original</dt><dd class="text-slate-100 mt-1 truncate" title="{{ archivo.filename }}">{{ archivo.filename }}</dd></div>
             <div><dt class="text-slate-400">Fecha de subida</dt><dd class="text-slate-100 mt-1">{{ archivo.fecha_subida }}</dd></div>
-            <div><dt class="text-slate-400">Idioma</dt><dd class="text-slate-100 mt-1">{{ archivo.idioma_destino }}</dd></div>
+            <div><dt class="text-slate-400">Idioma</dt><dd class="text-slate-100 mt-1">{{ archivo.idioma_nombre }}</dd></div>
             <div><dt class="text-slate-400">ID</dt><dd class="text-slate-100 mt-1 font-mono">{{ archivo.id }}</dd></div>
           </dl>
         </div>
