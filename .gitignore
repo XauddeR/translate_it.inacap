@@ -1,8 +1,10 @@
 venv/
 .env
+tests/
 
 __pycache__/
-uploads/
 *.py[cod]
 
 .pytest_cache/
+
+uploads/
