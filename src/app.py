@@ -1,6 +1,6 @@
 import os
 from config import Config
-from flask import Flask, render_template, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, flash, current_app
 from flask_wtf.csrf import CSRFProtect, CSRFError 
 from models.user_model import User
 from routes.auth_routes import auth_bp
@@ -8,17 +8,13 @@ from routes.main_routes import main_bp
 from routes.upload_routes import upload_bp
 from routes.admin_routes import admin_bp
 from routes.support_routes import support_bp
-from utils.extensions import mysql, login_manager
+from utils.extensions import mysql, login_manager, mail
 
 csrf = CSRFProtect()
 
 def translateit():
     app = Flask(__name__)
     app.config.from_object(Config)
-
-    csrf.init_app(app)  
-    mysql.init_app(app)
-    login_manager.init_app(app)
 
     login_manager.login_view = 'auth.login'
 
@@ -28,6 +24,11 @@ def translateit():
 
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok = True)
     os.makedirs(app.config['THUMBNAIL_FOLDER'], exist_ok = True)
+    
+    csrf.init_app(app)  
+    mysql.init_app(app)
+    login_manager.init_app(app)
+    mail.init_app(app)
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
@@ -38,17 +39,17 @@ def translateit():
     @login_manager.user_loader
     def load_user(user_id):
         cur = mysql.connection.cursor()
-        cur.execute("""
+        cur.execute('''
             SELECT 
-                u.ID        AS id,
-                u.USUARIO   AS usuario,
-                u.EMAIL     AS email,
+                u.ID AS id,
+                u.USUARIO AS usuario,
+                u.EMAIL AS email,
                 (a.usuario_id IS NOT NULL) AS is_admin
             FROM usuarios u
             LEFT JOIN administradores a ON a.usuario_id = u.ID
             WHERE u.ID = %s
             LIMIT 1
-        """, (user_id,))
+        ''', (user_id,))
         row = cur.fetchone()
         cur.close()
         if not row:
