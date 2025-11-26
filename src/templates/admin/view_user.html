@@ -71,18 +71,16 @@
       </aside>
 
       <main class="space-y-6">
-        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% with messages = get_flashed_messages(with_categories=true, category_filter=['admin_user_error', 'admin_user_success']) %}
           {% if messages %}
-            <div id="mainFlashContainer" class="mb-2 space-y-2">
+            <div class="containerFlashMessage mb-4 space-y-2">
               {% for category, message in messages %}
-                {% if category != 'add_user_error' %}
-                  <div class="flash-message-item rounded-xl px-4 py-3 text-sm
-                              {% if 'success' in category %} bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30
-                              {% elif 'error' in category %} bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30
-                              {% else %} bg-white/5 text-slate-200 ring-1 ring-white/10 {% endif %}">
-                    {{ message }}
-                  </div>
-                {% endif %}
+                <div class="rounded-xl px-4 py-3 text-sm
+                            {% if category == 'admin_user_error' %} bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30
+                            {% elif category == 'admin_user_success' %} bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30
+                            {% else %} bg-white/5 text-slate-200 ring-1 ring-white/10 {% endif %}">
+                  {{ message }}
+                </div>
               {% endfor %}
             </div>
           {% endif %}
@@ -182,20 +180,6 @@
      class="fixed inset-0 z-50 hidden items-center justify-center">
   <div class="absolute inset-0 bg-slate-900/80 backdrop-blur" onclick="closeAddUserModal()"></div>
   <div class="relative z-10 w-[95%] max-w-md rounded-2xl bg-slate-950 ring-1 ring-white/10 p-6">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div id="modalFlashContainer" class="mb-4 space-y-2">
-          {% for category, message in messages %}
-            {% if category == 'add_user_error' %}
-              <div class="flash-message-item rounded-xl px-4 py-3 text-sm bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30">
-                {{ message }}
-              </div>
-            {% endif %}
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
-
     <h2 class="text-xl font-bold text-slate-100 text-center">Crear nuevo usuario</h2>
 
     <form id="addUserForm" method="POST" action="{{ url_for('admin.add_user') }}" class="mt-5 space-y-5">
@@ -292,109 +276,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-  const addModal = document.getElementById('addUserModal');
-  function openAddUserModal() {
-    addModal.classList.remove('hidden');
-    addModal.classList.add('flex');
-    const modalFlash = document.getElementById('modalFlashContainer');
-    if (modalFlash) modalFlash.innerHTML = '';
-  }
-  function closeAddUserModal() {
-    addModal.classList.add('hidden');
-    addModal.classList.remove('flex');
-  }
-  addModal?.addEventListener('click', (e) => { if (e.target === addModal) closeAddUserModal(); });
-
-  setTimeout(() => {
-    document.querySelectorAll('.flash-message-item').forEach(el => {
-      el.classList.add('opacity-0','transition','duration-700');
-      setTimeout(() => el.remove(), 700);
-    });
-  }, 5000);
-
-  const editModal = document.getElementById('editUserModal');
-  const editForm  = document.getElementById('editUserForm');
-
-  function openEditUserModal(id, usuario, email, is_admin) {
-    editForm.action = "{{ url_for('admin.update_user', user_id=0) }}".replace('/0', `/${id}`);
-
-    document.getElementById('edit_usuario').value = usuario || '';
-    document.getElementById('edit_email').value   = email || '';
-    const passEl  = document.getElementById('edit_password');
-    const nivelEl = document.getElementById('edit_nivel');
-    if (passEl)  passEl.value  = '';
-    if (nivelEl) nivelEl.value = (is_admin ? 'admin' : 'usuario');
-
-    editModal.classList.remove('hidden');
-    editModal.classList.add('flex');
-  }
-
-  function closeEditUserModal() {
-    editModal.classList.add('hidden');
-    editModal.classList.remove('flex');
-  }
-
-  editModal?.addEventListener('click', (e) => { if (e.target === editModal) closeEditUserModal(); });
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.btn-edit-user');
-    if (!btn) return;
-    const id      = Number(btn.dataset.id);
-    const usuario = btn.dataset.usuario || '';
-    const email   = btn.dataset.email || '';
-    const isAdmin = btn.dataset.isAdmin === '1' || btn.dataset.isAdmin === 'true';
-    openEditUserModal(id, usuario, email, isAdmin);
-  });
-
-  editForm?.addEventListener('submit', () => {
-    const submitBtn = editForm.querySelector('button[type="submit"]');
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Guardando…';
-    }
-  });
-
-  const confirmModal = document.getElementById('confirmDeleteModal');
-  const confirmOverlay = document.getElementById('confirmOverlay');
-  const cancelDelBtn = document.getElementById('cancelDeleteBtn');
-  const delForm = document.getElementById('deleteUserForm');
-
-  function openConfirm(url) {
-    delForm.action = url;
-    confirmModal.classList.remove('hidden');
-    confirmModal.classList.add('flex');
-  }
-
-  function closeConfirm() {
-    confirmModal.classList.add('hidden');
-    confirmModal.classList.remove('flex');
-    delForm.action = '';
-  }
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.btn-delete-user');
-    if (!btn) return;
-    e.preventDefault();
-    openConfirm(btn.dataset.url);
-  });
-
-  cancelDelBtn?.addEventListener('click', closeConfirm);
-  confirmOverlay?.addEventListener('click', closeConfirm);
-
-  delForm?.addEventListener('submit', () => {
-    const btn = delForm.querySelector('button[type="submit"]');
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = 'Eliminando…';
-    }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    if (addModal && !addModal.classList.contains('hidden'))  closeAddUserModal();
-    if (editModal && !editModal.classList.contains('hidden')) closeEditUserModal();
-    if (confirmModal && !confirmModal.classList.contains('hidden')) closeConfirm();
-  });
-</script>
+<script src="{{ url_for('static', filename='js/admin_panel_user.js') }}"></script>
 {% endblock %}

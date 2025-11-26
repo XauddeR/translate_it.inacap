@@ -58,20 +58,20 @@
       </aside>
 
       <main class="space-y-6">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div id="flashes" class="space-y-2">
-              {% for c,m in messages %}
-                <div class="flash-message rounded-xl px-4 py-3 text-sm
-                            {% if c in ['error','danger'] %} bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30
-                            {% elif c == 'success' %} bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30
-                            {% else %} bg-white/5 text-slate-200 ring-1 ring-white/10 {% endif %}">
-                  {{ m }}
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
+      {% with messages = get_flashed_messages(with_categories=true, category_filter=['admin_ticket_error', 'admin_ticket_success']) %}
+        {% if messages %}
+          <div class="containerFlashMessage mb-4 space-y-2">
+            {% for category, message in messages %}
+              <div class="rounded-xl px-4 py-3 text-sm
+                          {% if category == 'admin_ticket_error' %} bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30
+                          {% elif category == 'admin_ticket_success' %} bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30
+                          {% else %} bg-white/5 text-slate-200 ring-1 ring-white/10 {% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
         <form class="p-6 rounded-2xl bg-white/5 ring-1 ring-white/10 grid grid-cols-1 sm:grid-cols-[200px,1fr,auto,auto] gap-4" method="GET">
           <div>
             <label for="estado" class="block text-sm font-medium text-slate-200 mb-1">Estado</label>
@@ -166,12 +166,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-  setTimeout(() => {
-    document.querySelectorAll('.flash-message').forEach(el => {
-      el.classList.add('opacity-0','transition','duration-700');
-      setTimeout(() => el.remove(), 700);
-    });
-  }, 5000);
-</script>
+
 {% endblock %}

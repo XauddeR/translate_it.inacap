@@ -1,5 +1,7 @@
 import os
-from flask import Blueprint, render_template, abort, send_from_directory, flash, redirect, url_for, send_file, request, current_app
+import time
+import json
+from flask import Blueprint, render_template, abort, send_from_directory, redirect, url_for, send_file, jsonify, request, current_app, Response, stream_with_context
 from werkzeug.utils import secure_filename
 from flask_login import current_user, login_required
 from utils.extensions import mysql
@@ -43,10 +45,13 @@ def file_detail(archivo_id):
             a.traduccion,
             a.idioma_destino,
             a.fecha_subida,
+            a.estado_proceso,
+            a.error_mensaje,
+            a.progreso,
             i.nombre AS idioma_nombre
         FROM archivos a
         LEFT JOIN idiomas i
-          ON a.idioma_destino = i.codigo
+        ON a.idioma_destino = i.codigo
         WHERE a.id = %s AND a.usuario_id = %s
         LIMIT 1
     ''', (archivo_id, current_user.id))
@@ -101,7 +106,6 @@ def update_file(archivo_id):
     mysql.connection.commit()
     cursor.close()
 
-    flash('Título del archivo actualizado correctamente.', 'update_success')
     return redirect(url_for('main.history'))
 
 @main_bp.route('/delete_file/<archivo_id>', methods=['POST'])
@@ -114,7 +118,6 @@ def delete_file(archivo_id):
     )
     mysql.connection.commit()
     cursor.close()
-    flash('Archivo eliminado del historial.', 'delete_success')
     return redirect(url_for('main.history'))
 
 @main_bp.route('/download/<archivo_id>')
@@ -148,4 +151,72 @@ def download(archivo_id):
         as_attachment = True,
         download_name = nombre_txt,
         mimetype = 'text/plain'
+    )
+
+@main_bp.route('/api/file_status/<archivo_id>')
+@login_required
+def file_status(archivo_id):
+    cursor = mysql.connection.cursor()
+    cursor.execute(
+        '''
+        SELECT estado_proceso, progreso
+        FROM archivos
+        WHERE id = %s AND usuario_id = %s
+        ''',
+        (archivo_id, current_user.id)
+    )
+    row = cursor.fetchone()
+    cursor.close()
+
+    if not row:
+        return jsonify({'error': 'not_found'}), 404
+
+    return jsonify({
+        'estado': row['estado_proceso'],
+        'progreso': int(row['progreso'])
+    })
+
+@main_bp.route('/stream/progress/<video_id>')
+@login_required
+def stream_progress(video_id):
+    def generate():
+        while True:
+            cursor = mysql.connection.cursor()
+            cursor.execute(
+                '''
+                SELECT estado_proceso, progreso, error_mensaje
+                FROM archivos
+                WHERE id = %s AND usuario_id = %s
+                ''',
+                (video_id, current_user.id)
+            )
+            row = cursor.fetchone()
+            cursor.close()
+
+            if not row:
+                payload = {'error': 'Archivo no encontrado'}
+                yield f'data: {json.dumps(payload)}\n\n'
+                break
+
+            estado = row['estado_proceso']
+            progreso = row['progreso']
+            error_msg = row.get('error_mensaje')
+
+            payload = {
+                'estado': estado,
+                'progreso': progreso,
+                'error': error_msg
+            }
+
+            yield f'data: {json.dumps(payload)}\n\n'
+
+            if estado in ('completado', 'error'):
+                break
+
+            time.sleep(1)
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype = 'text/event-stream',
+        headers = {'Cache-Control': 'no-cache'}
     )

@@ -54,18 +54,16 @@
       </aside>
 
       <main>
-        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% with messages = get_flashed_messages(with_categories=true, category_filter=['upload_error', 'upload_success']) %}
           {% if messages %}
-            <div class="mb-6 space-y-2" id="flashContainer">
+            <div class="containerFlashMessage mb-4 space-y-2">
               {% for category, message in messages %}
-                {% if 'upload' in category %}
-                  <div class="flash-message rounded-xl px-4 py-3 text-sm
-                              {% if 'success' in category %} bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30
-                              {% elif 'error' in category %} bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30
-                              {% else %} bg-white/5 text-slate-200 ring-1 ring-white/10 {% endif %}">
-                    {{ message }}
-                  </div>
-                {% endif %}
+                <div class="rounded-xl px-4 py-3 text-sm
+                            {% if category == 'upload_error' %} bg-rose-900/30 text-rose-200 ring-1 ring-rose-500/30
+                            {% elif category == 'upload_success' %} bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30
+                            {% else %} bg-white/5 text-slate-200 ring-1 ring-white/10 {% endif %}">
+                  {{ message }}
+                </div>
               {% endfor %}
             </div>
           {% endif %}
@@ -110,12 +108,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-  setTimeout(() => {
-    document.querySelectorAll('.flash-message').forEach(el => {
-      el.classList.add('opacity-0', 'transition', 'duration-700');
-      setTimeout(() => el.remove(), 700);
-    });
-  }, 5000);
-</script>
+
 {% endblock %}
