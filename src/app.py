@@ -8,7 +8,9 @@ from routes.main_routes import main_bp
 from routes.upload_routes import upload_bp
 from routes.admin_routes import admin_bp
 from routes.support_routes import support_bp
-from utils.extensions import mysql, login_manager, mail
+from utils.extensions import mysql, login_manager, mail, socketio
+from werkzeug.exceptions import RequestEntityTooLarge
+from utils.date_filter import format_date
 
 csrf = CSRFProtect()
 
@@ -29,6 +31,12 @@ def translateit():
     mysql.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+    socketio.init_app(app, cors_allowed_origins = '*')
+
+    with app.app_context():
+        import utils.socket_events
+
+    app.jinja_env.filters['format_date'] = format_date
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
@@ -68,8 +76,13 @@ def translateit():
         flash('Sesión expirada o token inválido. Vuelve a intentar.', 'error')
         return redirect(url_for('main.index')), 400
     
+    @app.errorhandler(RequestEntityTooLarge)
+    def handle_file_too_large(e):
+        flash('El archivo supera el tamaño máximo permitido (200 MB).', 'upload_error')
+        return redirect(url_for('upload.upload_file'))
+    
     return app
 
 if __name__ == '__main__':
     app = translateit()
-    app.run(debug = True)
+    socketio.run(app, host = '0.0.0.0', port = 5000, debug = True)
