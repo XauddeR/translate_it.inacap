@@ -3,7 +3,6 @@ from flask_login import login_user, logout_user, login_required, current_user
 from utils.tokens import confirm_reset_token
 from services.email_service import send_password_reset_email
 from utils.extensions import mysql
-from flask_mail import Message
 from werkzeug.security import check_password_hash, generate_password_hash
 from models.user_model import create_user, User
 
