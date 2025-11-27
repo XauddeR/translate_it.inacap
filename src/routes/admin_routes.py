@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
+from datetime import datetime, timedelta, timezone
 from functools import wraps
-from utils.languages_dao import get_lang, add_lang, delete_lang, enable_lang, disable_lang
+from utils.languages_dao import get_lang, add_lang, enable_lang, disable_lang
 from utils.extensions import mysql
 
 admin_bp = Blueprint('admin', __name__)
@@ -39,25 +40,98 @@ def admin_dashboard():
         LIMIT 5
     ''')
     idiomas = cursor.fetchall()
+
+    today = datetime.now(timezone.utc).date()
+    ago_30 = today - timedelta(days = 29)
+
+    cursor.execute('''
+        SELECT DATE(fecha_registro) AS fecha, COUNT(*) AS cantidad
+        FROM usuarios
+        WHERE fecha_registro >= %s
+        GROUP BY DATE(fecha_registro)
+        ORDER BY fecha ASC
+    ''', (ago_30,))
+    rows = cursor.fetchall()
     cursor.close()
-    return render_template('admin/admin_dashboard.html', total_users = total_users, total_admins = total_admins, total_archivos = total_archivos, idiomas = idiomas)
+
+    counts_by_day = {row['fecha']: row['cantidad'] for row in rows}
+
+    labels = []
+    values = []
+    for i in range(30):
+        fecha = ago_30 + timedelta(days = i)
+        labels.append(fecha.strftime('%d/%m'))
+        values.append(counts_by_day.get(fecha, 0))    
+
+    cursor.close()
+    return render_template('admin/admin_dashboard.html', 
+                           total_users = total_users, 
+                           total_admins = total_admins, 
+                           total_archivos = total_archivos, 
+                           idiomas = idiomas,
+                           daily_labels = labels,
+                           daily_values = values)
 
 # Visualización de todos los usuarios registrados en el sistema
 @admin_bp.route('/view-users')
 @login_required
 @admin_required
 def view_users():
+    q = (request.args.get('q') or '').strip()
+    filtro = (request.args.get('filtro') or '').strip()
+    rol = (request.args.get('rol') or '').strip()
+
+    where = []
+    params = []
+
+    if q:
+        if filtro == 'id':
+            if q.isdigit():
+                where.append('u.id = %s')
+                params.append(int(q))
+            else:
+                where.append('1 = 0')
+        elif filtro == 'usuario':
+            where.append('u.usuario LIKE %s')
+            params.append(f'%{q}%')
+        elif filtro == 'email':
+            where.append('u.email LIKE %s')
+            params.append(f'%{q}%')
+        else:
+            like = f'%{q}%'
+            where.append('(u.usuario LIKE %s OR u.email LIKE %s OR CAST(u.id AS CHAR) LIKE %s)')
+            params.extend([like, like, like])
+
+    if rol == 'admin':
+        where.append('a.id IS NOT NULL')
+    elif rol == 'usuario':
+        where.append('a.id IS NULL')
+
+    where_sql = 'WHERE ' + ' AND '.join(where) if where else ''
+
     cursor = mysql.connection.cursor()
-    cursor.execute('''
-        SELECT u.id, u.usuario, u.email,
-               CASE WHEN a.id IS NULL THEN 0 ELSE 1 END AS is_admin
+    cursor.execute(f'''
+        SELECT 
+            u.id,
+            u.usuario,
+            u.email,
+            CASE WHEN a.id IS NULL THEN 0 ELSE 1 END AS is_admin
         FROM usuarios u
         LEFT JOIN administradores a ON a.usuario_id = u.id
+        {where_sql}
         ORDER BY u.fecha_registro ASC
-    ''')
+    ''', params)
     users = cursor.fetchall()
     cursor.close()
-    return render_template('admin/view_user.html', users = users)
+
+    return render_template(
+        'admin/view_user.html',
+        users = users,
+        q = q,
+        filtro = filtro,
+        rol = rol,
+    )
+
 
 # Eliminar usuarios según ID
 @admin_bp.route('/delete/<int:user_id>', methods = ['POST'])
@@ -160,6 +234,7 @@ def add_user():
 
     return redirect(url_for('admin.view_users'))
 
+# Vista administrador de todos los tickets solicitados por usuarios.
 @admin_bp.route('/support')
 @login_required
 @admin_required
@@ -198,6 +273,7 @@ def support_list():
 
     return render_template('admin/support_list.html', tickets = tickets, estado = estado, q = q)
 
+# Gestión de un ticket por ID.
 @admin_bp.route('/support/<int:ticket_id>')
 @login_required
 @admin_required
@@ -229,6 +305,7 @@ def support_ticket_detail(ticket_id):
 
     return render_template('admin/support_ticket.html', ticket = ticket, mensajes = mensajes)
 
+# Responder ticket.
 @admin_bp.post('/support/tickets/<int:ticket_id>/reply', endpoint = 'support_ticket_reply')
 @admin_required
 def support_ticket_reply(ticket_id):
@@ -270,6 +347,7 @@ def support_ticket_reply(ticket_id):
     flash('Respuesta enviada.', 'admin_ticket_success')
     return redirect(url_for('admin.support_ticket_detail', ticket_id = ticket_id))
 
+# Actualización de estado del ticket.
 @admin_bp.post('/support/tickets/<int:ticket_id>/status', endpoint = 'support_ticket_set_status')
 @admin_required
 def support_ticket_set_status(ticket_id):
@@ -299,6 +377,7 @@ def support_ticket_set_status(ticket_id):
     flash(f'Estado actualizado a {estado}.', 'admin_ticket_success')
     return redirect(url_for('admin.support_ticket_detail', ticket_id = ticket_id))
 
+# Gestión de idiomas disponibles.
 @admin_bp.route('/languages', methods = ['GET'])
 @login_required
 @admin_required
@@ -306,6 +385,7 @@ def languages_list():
     languages = get_lang()
     return render_template('admin/languages_list.html', languages = languages)
 
+# Añadir idioma por código [documentación DeepL].
 @admin_bp.route('/add-language', methods = ['POST'])
 @login_required
 @admin_required
@@ -322,23 +402,29 @@ def create_language():
         print(f'Error: {e}')
     return redirect(url_for('admin.languages_list'))
 
-@admin_bp.route('/languages/<int:idioma_id>/toggle', methods = ['POST'])
+# Habilitar/deshabilitar idioma.
+@admin_bp.route('/languages/<int:idioma_id>/toggle', methods=['POST'])
 @login_required
 @admin_required
 def toggle_lang(idioma_id):
-    action = request.form.get('accion')
-    if action == 'disable':
-        disable_lang(idioma_id)
-        flash('Idioma deshabilitado', 'language_warning')
-    elif action == 'enable':
-        enable_lang(idioma_id)
-        flash('Idioma habilitado', 'language_success')
-    return redirect(url_for('admin.languages_list'))
+    cursor = mysql.connection.cursor()
+    try:
+        cursor.execute("SELECT nombre FROM idiomas WHERE id = %s LIMIT 1", (idioma_id,))
+        row = cursor.fetchone()
+        cursor.close()
 
-@admin_bp.route('/languages/<int:idioma_id>/delete', methods = ['POST'])
-@login_required
-@admin_required
-def delete_lang(idioma_id):
-    delete_lang(idioma_id)
-    flash('Idioma eliminado', 'language_success')
+        nombre = row['nombre'] if row else 'Idioma'
+        action = request.form.get('accion')
+
+        if action == 'disable':
+            disable_lang(idioma_id)
+            flash(f'{nombre} fue deshabilitado.', 'language_warning')
+        
+        elif action == 'enable':
+            enable_lang(idioma_id)
+            flash(f'{nombre} fue habilitado.', 'language_success')
+    except Exception as e:
+        print(f'Error toggle: {e}')
+        flash(f'Ha ocurrido un error inesperado')
+
     return redirect(url_for('admin.languages_list'))

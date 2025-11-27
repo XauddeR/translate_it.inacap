@@ -45,7 +45,7 @@ def create_ticket():
     except Exception as e:
         mysql.connection.rollback()
         flash('No se pudo crear el ticket. Intenta de nuevo.', 'ticket_error')
-        raise
+        return redirect(url_for('support.support_home'))
     finally:
         cursor.close()
 
@@ -85,7 +85,7 @@ def reply_ticket(ticket_id):
 
     cursor.execute('''INSERT INTO ticket_mensajes (ticket_id, autor_usuario_id, mensaje, creado_en)
                    VALUES (%s, %s, %s, NOW())''', (ticket_id, current_user.id, texto))
-    cursor.execute('UPDATE tickets SET estado=\'pendiente\', actualizado_en = NOW() WHERE id = %s', (ticket_id,))
+    cursor.execute("UPDATE tickets SET estado='pendiente', actualizado_en = NOW() WHERE id = %s", (ticket_id,))
     mysql.connection.commit()
     cursor.close()
 

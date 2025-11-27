@@ -77,7 +77,7 @@ def forgot_password():
             try:
                 send_password_reset_email(user)
             except Exception as e:
-                print('[ERROR] Envío de mail:', e)
+                print('Error en envio de email: ', e)
                 flash('No pudimos enviar el correo en este momento. Intenta de nuevo más tarde.', 'forgot_error',)
                 return redirect(request.url)
 

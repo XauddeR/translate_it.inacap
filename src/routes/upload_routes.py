@@ -8,8 +8,7 @@ from services.deepl_api import translate_text, TranslationError
 from services.transcription import audio_transcription
 from utils.video_proccess import audio_extract, convert_mp4, create_thumbnail
 from utils.languages_dao import get_lang
-from utils.extensions import mysql
-from threading import Thread
+from utils.extensions import mysql, socketio
 from pathlib import Path
 
 upload_bp = Blueprint('upload', __name__)
@@ -82,12 +81,14 @@ def upload_file():
 
             app = current_app._get_current_object()
 
-            thread = Thread(
-                target = _process_video_async,
-                args = (app, unique_id, temp_path, original_filename, language.upper()),
-                daemon = True
+            socketio.start_background_task(
+                _process_video_async,
+                app,
+                unique_id,
+                temp_path,
+                original_filename,
+                language.upper()
             )
-            thread.start()
 
             flash('Se inició el procesamiento del video. Puedes continuar navegando.', 'upload_success')
             return redirect(url_for('main.history'))
@@ -99,44 +100,57 @@ def upload_file():
     return render_template('upload.html', langs = langs)
 
 def _update_video_status(video_id, estado = None, progreso = None, error_mensaje = None):
-    cursor = mysql.connection.cursor()
+    try:
+        cursor = mysql.connection.cursor()
+        campos = []
+        valores = []
 
-    campos = []
-    valores = []
+        if estado is not None:
+            campos.append('estado_proceso = %s')
+            valores.append(estado)
 
-    if estado is not None:
-        campos.append('estado_proceso = %s')
-        valores.append(estado)
+        if progreso is not None:
+            campos.append('progreso = %s')
+            valores.append(progreso)
 
-    if progreso is not None:
-        campos.append('progreso = %s')
-        valores.append(progreso)
+        if error_mensaje is not None:
+            campos.append('error_mensaje = %s')
+            valores.append(error_mensaje)
 
-    if error_mensaje is not None:
-        campos.append('error_mensaje = %s')
-        valores.append(error_mensaje)
-
-    if not campos:
+        if campos:
+            query = f"UPDATE archivos SET {', '.join(campos)} WHERE id = %s"
+            valores.append(video_id)
+            cursor.execute(query, tuple(valores))
+            mysql.connection.commit()
+        
         cursor.close()
-        return
+    except Exception as e:
+        print(f'Error actualizando DB: {e}')
 
-    query = f'UPDATE archivos SET {', '.join(campos)} WHERE id = %s'
-    valores.append(video_id)
-
-    cursor.execute(query, tuple(valores))
-    mysql.connection.commit()
-    cursor.close()
+    socketio.emit(
+        'status_update',
+        {
+            'id': video_id,
+            'progreso': progreso,
+            'estado': estado,
+            'error': error_mensaje
+        },
+        room = video_id
+    )
 
 def _process_video_async(app, video_id, temp_path, original_filename, language):
     with app.app_context():
         try:
             _update_video_status(video_id, estado = 'procesando', progreso = 1)
 
-            hb_thread = Thread(target = _progress_heartbeat, args = (app, video_id), daemon=True)
-            hb_thread.start()
-
             final_path = convert_mp4(temp_path)
             _update_video_status(video_id, progreso = 15)
+
+            try:
+                if temp_path != final_path and os.path.exists(temp_path):
+                    os.remove(temp_path)
+            except OSError as e:
+                print(f'No se pudo eliminar el archivo original {temp_path}: {e}')
 
             audio_path = audio_extract(final_path)
             _update_video_status(video_id, progreso = 35)
@@ -150,8 +164,8 @@ def _process_video_async(app, video_id, temp_path, original_filename, language):
                 _update_video_status(
                     video_id,
                     estado = 'error',
-                    progreso = 70,
-                    error_mensaje = f'Error de traducción: {str(te)}'
+                    progreso = 0,
+                    error_mensaje = str(te)
                 )
                 return
 
@@ -186,49 +200,13 @@ def _process_video_async(app, video_id, temp_path, original_filename, language):
             mysql.connection.commit()
             cursor.close()
 
+            _update_video_status(video_id, estado = 'completado', progreso = 100)
+
         except Exception as e:
+            print(f'Falla en el procesamiento: {e}')
             _update_video_status(
                 video_id,
                 estado = 'error',
                 progreso = 0,
                 error_mensaje = str(e)
             )
-
-def _progress_heartbeat(app, video_id):
-    with app.app_context():
-        while True:
-            cursor = mysql.connection.cursor()
-            cursor.execute(
-                '''
-                SELECT estado_proceso, progreso
-                FROM archivos
-                WHERE id = %s
-                ''',
-                (video_id,)
-            )
-            row = cursor.fetchone()
-            cursor.close()
-
-            if not row:
-                break
-
-            estado = row['estado_proceso']
-            current_pct = int(row['progreso'] or 0)
-
-            if estado != 'procesando':
-                break
-
-            if current_pct >= 98:
-                time.sleep(1)
-                continue
-
-            new_pct = current_pct + 1
-            cursor = mysql.connection.cursor()
-            cursor.execute(
-                'UPDATE archivos SET progreso = %s WHERE id = %s',
-                (new_pct, video_id)
-            )
-            mysql.connection.commit()
-            cursor.close()
-
-            time.sleep(1)
