@@ -6,6 +6,9 @@
   <title>{% block title %}Translate It{% endblock %}</title>
   <meta name="description" content="Translate It" />
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='icons/favicon.svg') }}">
+
+  <link href="https://vjs.zencdn.net/8.13.0/video-js.css" rel="stylesheet">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -134,6 +137,7 @@
 
   <script src="{{ url_for('static', filename='js/mobile_nav.js') }}"></script>
   <script src="{{ url_for('static', filename='js/flash_eraser.js') }}"></script>
+  <script src="https://vjs.zencdn.net/8.13.0/video.min.js"></script>
 
   {% block scripts %}{% endblock %}
 </body>

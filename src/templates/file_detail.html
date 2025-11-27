@@ -84,10 +84,16 @@
           <div class="lg:col-span-3 rounded-2xl bg-white/5 ring-1 ring-white/10 overflow-hidden">
             <div class="relative w-full pb-[56.25%] bg-black/60">
               {% if completado %}
-                <video controls class="absolute inset-0 w-full h-full object-contain bg-black">
-                  <source src="{{ url_for('main.file_video', filename=archivo.ruta_video.split('/')[-1]) }}" type="video/mp4">
-                  Tu navegador no soporta el tag de video.
-                </video>
+            <video
+              id="video-{{ archivo.id }}"
+              class="video-js vjs-big-play-centered vjs-default-skin absolute inset-0 w-full h-full object-contain bg-black"
+              controls
+              preload="auto"
+              data-setup='{}'
+            >
+              <source src="{{ url_for('main.file_video', filename=archivo.ruta_video.split('/')[-1]) }}" type="video/mp4">
+              Tu navegador no soporta el tag de video.
+            </video>
               {% elif archivo.estado_proceso == 'error' %}
                 <div class="absolute inset-0 flex flex-col items-center justify-center text-rose-200 text-sm px-4 text-center">
                   <p class="mb-2 font-semibold">Ocurrió un error al procesar tu video.</p>
@@ -168,7 +174,7 @@
               </div>
               <div>
                 <dt class="text-slate-400">Fecha de subida</dt>
-                <dd class="text-slate-100 mt-1">{{ archivo.fecha_subida }}</dd>
+                <dd class="text-slate-100 mt-1">{{ archivo.fecha_subida|format_date("%d/%m/%Y %H:%M") }}</dd>
               </div>
               <div>
                 <dt class="text-slate-400">Idioma</dt>

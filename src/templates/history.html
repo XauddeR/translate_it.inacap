@@ -13,7 +13,7 @@
     <div class="flex items-center justify-between gap-4 mb-6">
       <div>
         <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Historial de archivos</h1>
-        <p class="mt-1 text-slate-300">Revisa tus cargas, abre detalles, renombra o elimina archivos.</p>
+        <p class="mt-1 text-slate-300">En esta sección podrás tener acceso a todos tus archivos procesados.</p>
       </div>
     </div>
 
@@ -90,7 +90,7 @@
                      title="{{ archivo.nombre_archivo if archivo.nombre_archivo else archivo.filename }}">
                     {{ archivo.nombre_archivo if archivo.nombre_archivo else archivo.filename }}
                   </p>
-                  <p class="text-xs text-slate-400 mt-1">Subido el {{ archivo.fecha_subida }}</p>
+                  <p class="text-xs text-slate-400 mt-1">{{ archivo.fecha_subida|format_date("%d/%m/%Y %H:%M") }}</p>
 
                   {% if archivo.estado_proceso == 'procesando' %}
                     <div class="mt-2">
@@ -235,6 +235,8 @@
 {% endblock %}
 
 {% block scripts %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
   <script src="{{ url_for('static', filename='js/history.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/websocket.js') }}"></script>
 {% endblock %}
 

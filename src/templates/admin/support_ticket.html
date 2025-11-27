@@ -78,14 +78,20 @@
         {% endif %}
       {% endwith %}
 
+      {% set estado_clases = {
+                'abierto':   'bg-brand-900/30 text-brand-200 ring-1 ring-brand-500/30',
+                'pendiente': 'bg-amber-900/30 text-amber-200 ring-1 ring-amber-500/30',
+                'resuelto':  'bg-emerald-900/30 text-emerald-200 ring-1 ring-emerald-500/30',
+                'cerrado':   'bg-slate-800 text-slate-400 ring-1 ring-white/10'
+              } %}
+
         <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-5 flex flex-wrap gap-3 justify-between items-start">
           <div>
-            <p class="text-sm text-slate-300">
-              Estado actual:
-              <span class="font-medium">{{ ticket.estado|capitalize }}</span>
-            </p>
+            <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium {{ estado_clases.get(ticket.estado|lower, estado_clases['cerrado']) }}">
+              {{ ticket.estado|capitalize }}
+            </span>
             <p class="text-xs text-slate-400 mt-1">
-              Creado: {{ ticket.creado_en }}{% if ticket.actualizado_en %} · Actualizado: {{ ticket.actualizado_en }}{% endif %}
+              Creado: {{ ticket.creado_en|format_date("%d/%m/%Y %H:%M") }}{% if ticket.actualizado_en %} · Actualizado: {{ ticket.actualizado_en|format_date("%d/%m/%Y %H:%M") }}{% endif %}
             </p>
           </div>
           <form action="{{ url_for('admin.support_ticket_set_status', ticket_id=ticket.id) }}" method="POST" class="flex flex-wrap gap-2">
@@ -103,16 +109,25 @@
               {% for m in mensajes %}
                 {% set es_usuario = m.autor_usuario_id is not none %}
                 <div class="flex {{ 'justify-start' if es_usuario else 'justify-end' }}">
-                  <div class="max-w-[80%] break-words">
-                    <div class="flex items-center gap-2 text-xs mb-1 {{ 'justify-start' if es_usuario else 'justify-end' }}">
-                      <span class="text-slate-400">• {{ m.creado_en }}</span>
+                  <div class="max-w-[80%] flex flex-col {{ 'items-start' if es_usuario else 'items-end' }}">
+                    <div class="text-xs mb-1 text-slate-400 {{ 'text-left' if es_usuario else 'text-right' }}">
+                      <span class="font-bold">
+                        {{ 'Soporte' if not es_usuario else ticket.usuario_nombre }}
+                      </span>
+                      • {{ m.creado_en|format_date("%d/%m/%Y %H:%M") }}
                     </div>
-                    <div class="whitespace-pre-wrap px-4 py-2.5 rounded-2xl text-sm leading-snug {{ 'bg-slate-900/60 text-slate-100 ring-1 ring-white/10' if es_usuario else 'bg-brand-900/30 text-slate-100 ring-1 ring-brand-500/30' }}">{{ m.mensaje }}</div>
+
+                    <div
+                      class="w-fit max-w-[500px] break-words whitespace-pre-wrap px-4 py-2.5 rounded-2xl text-sm leading-snug
+                            {{ 'bg-slate-900/60 text-slate-100 ring-1 ring-white/10' if es_usuario
+                                else 'bg-brand-900/30 text-slate-100 ring-1 ring-brand-500/30' }}">{{ m.mensaje }}</div>
                   </div>
                 </div>
               {% endfor %}
             {% else %}
-              <p class="text-sm text-center text-slate-400 py-4">No hay mensajes en este ticket.</p>
+              <p class="text-sm text-center text-slate-400 py-4">
+                No hay mensajes en este ticket.
+              </p>
             {% endif %}
           </div>
         </section>

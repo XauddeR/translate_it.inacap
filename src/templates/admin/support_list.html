@@ -12,7 +12,7 @@
     <div class="flex items-center justify-between gap-4 mb-6">
       <div>
         <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Tickets de Soporte</h1>
-        <p class="mt-1 text-slate-300">Administra y filtra las solicitudes de ayuda de los usuarios.</p>
+        <p class="mt-1 text-slate-300">Gestión de tickets.</p>
       </div>
     </div>
 
@@ -136,8 +136,8 @@
                       {{ t.estado|capitalize }}
                     </span>
                   </td>
-                  <td class="py-3 px-5 text-slate-300">{{ t.creado_en }}</td>
-                  <td class="py-3 px-5 text-slate-300">{{ t.actualizado_en or '—' }}</td>
+                  <td class="py-3 px-5 text-slate-300">{{ t.creado_en|format_date("%d/%m/%Y %H:%M") }}</td>
+                  <td class="py-3 px-5 text-slate-300">{{ t.actualizado_en|format_date("%d/%m/%Y %H:%M") or '—' }}</td>
                   <td class="py-3 px-5">
                     <a href="{{ url_for('admin.support_ticket_detail', ticket_id=t.id) }}"
                        title="Ver ticket"
