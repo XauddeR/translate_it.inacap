@@ -1,4 +1,3 @@
-import os
 from flask import url_for
 from flask_mail import Message
 from utils.extensions import mail
@@ -20,23 +19,14 @@ HTML_TEMPLATE = '''
       <td align="center">
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; background:white; border-radius:12px; overflow:hidden; box-shadow:0 3px 12px rgba(0,0,0,0.08);">
           
-          <!-- Logo -->
           <tr>
-            <td style="text-align:center; padding-top:28px;">
-              <img src="cid:logo_translateit" width="85" alt="Translate It Logo" style="margin-bottom:15px;">
-            </td>
-          </tr>
-
-          <!-- Header -->
-          <tr>
-            <td style="text-align:center; background:#0b4ea1; padding:22px 28px;">
+            <td style="background:#0b4ea1; padding:22px 28px;">
               <h1 style="color:white; margin:0; font-size:22px; font-weight:700;">
                 Restablecer tu contraseña
               </h1>
             </td>
           </tr>
 
-          <!-- Content -->
           <tr>
             <td style="padding:28px 35px; color:#333; font-size:15px; line-height:1.6;">
               <p>Hola <strong>{name}</strong>,</p>
@@ -66,7 +56,6 @@ HTML_TEMPLATE = '''
             </td>
           </tr>
 
-          <!-- Footer -->
           <tr>
             <td style="background:#f0f3f7; padding:18px 28px; text-align:center; font-size:12px; color:#777;">
               © 2025 Translate It. Todos los derechos reservados.
@@ -101,25 +90,15 @@ def send_password_reset_email(user):
         subject = subject,
         recipients = [user['email']]
     )
-
     msg.html = Markup(html_body)
+
     msg.body = f'''
-    Hola {user['usuario']},
+        Hola {user['usuario']},
 
-    Para restablecer tu contraseña, visita este enlace:
-    {reset_url}
+        Para restablecer tu contraseña, visita este enlace:
+        {reset_url}
 
-    Si no solicitaste este cambio, puedes ignorar este mensaje.
+        Si no solicitaste este cambio, puedes ignorar este mensaje.
     '''
-
-    logo_path = os.path.join(os.getcwd(), 'static', 'icons', 'logo.svg')
-
-    with open(logo_path, 'rb') as f:
-        msg.attach(
-            filename = 'logo.svg',
-            content_type = 'image/svg+xml',
-            data = f.read(),
-            disposition = 'inline',
-            headers = [('Content-ID', '<logo_translateit>')]
-        )
+    
     mail.send(msg)
