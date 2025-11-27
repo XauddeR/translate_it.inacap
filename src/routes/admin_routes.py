@@ -132,7 +132,6 @@ def view_users():
         rol = rol,
     )
 
-
 # Eliminar usuarios según ID
 @admin_bp.route('/delete/<int:user_id>', methods = ['POST'])
 @login_required
@@ -409,7 +408,7 @@ def create_language():
 def toggle_lang(idioma_id):
     cursor = mysql.connection.cursor()
     try:
-        cursor.execute("SELECT nombre FROM idiomas WHERE id = %s LIMIT 1", (idioma_id,))
+        cursor.execute('SELECT nombre FROM idiomas WHERE id = %s LIMIT 1', (idioma_id,))
         row = cursor.fetchone()
         cursor.close()
 
