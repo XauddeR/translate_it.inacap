@@ -150,11 +150,9 @@ def delete_user(user_id):
 @admin_required
 def update_user(user_id):
     cursor = mysql.connection.cursor()
-
     if request.method == 'POST':
         usuario = (request.form.get('usuario') or '').strip()
         email = (request.form.get('email') or '').strip()
-        password = (request.form.get('password') or '').strip()
         nivel = (request.form.get('nivel') or 'usuario').strip().lower()
 
         try:
@@ -162,14 +160,6 @@ def update_user(user_id):
                 cursor.close()
                 flash('Usuario y correo son obligatorios.', 'admin_user_error')
                 return redirect(url_for('admin.view_users'))
-
-            if password:
-                hashed = generate_password_hash(password)
-                cursor.execute('''
-                    UPDATE usuarios
-                    SET usuario = %s, email = %s, password_bcrypt = %s
-                    WHERE id = %s
-                ''', (usuario, email, hashed, user_id))
             else:
                 cursor.execute('''
                     UPDATE usuarios
