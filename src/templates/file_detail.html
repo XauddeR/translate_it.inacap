@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Detalle — {{ archivo.nombre_archivo if archivo.nombre_archivo else archivo.filename }}{% endblock %}
+{% block title %}Detalle — {{ files.nombre_archivo if files.nombre_archivo else files.filename }}{% endblock %}
 
 {% block content %}
 <section class="relative">
@@ -8,15 +8,15 @@
          style="background: radial-gradient(closest-side, rgba(59,130,246,.35), rgba(29,78,216,.25), transparent 70%);"></div>
   </div>
 
-  {% set completado = archivo.ruta_video and archivo.transcripcion and archivo.traduccion %}
+  {% set completado = files.ruta_video and files.transcripcion and files.traduccion %}
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-14">
     <div class="flex items-center justify-between gap-4 mb-6">
       <div class="min-w-0">
         <a href="{{ url_for('main.history') }}" class="text-sm text-brand-300 hover:text-brand-200">&larr; Volver al historial</a>
         <h1 class="mt-2 text-3xl md:text-4xl font-extrabold tracking-tight truncate"
-            title="{{ archivo.nombre_archivo if archivo.nombre_archivo else archivo.filename }}">
-          {{ archivo.nombre_archivo if archivo.nombre_archivo else archivo.filename }}
+            title="{{ files.nombre_archivo if files.nombre_archivo else files.filename }}">
+          {{ files.nombre_archivo if files.nombre_archivo else files.filename }}
         </h1>
       </div>
     </div>
@@ -79,89 +79,92 @@
       </div>
 
       <main class="space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
+        <div class="space-y-8">
 
-          <div class="lg:col-span-3 rounded-2xl bg-white/5 ring-1 ring-white/10 overflow-hidden">
-            <div class="relative w-full pb-[56.25%] bg-black/60">
+          <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 overflow-hidden">
+            <div class="relative w-full pb-[50%] bg-black">
               {% if completado %}
-            <video
-              id="video-{{ archivo.id }}"
-              class="video-js vjs-big-play-centered vjs-default-skin absolute inset-0 w-full h-full object-contain bg-black"
-              controls
-              preload="auto"
-              data-setup='{}'
-            >
-              <source src="{{ url_for('main.file_video', filename=archivo.ruta_video.split('/')[-1]) }}" type="video/mp4">
-              Tu navegador no soporta el tag de video.
-            </video>
-              {% elif archivo.estado_proceso == 'error' %}
-                <div class="absolute inset-0 flex flex-col items-center justify-center text-rose-200 text-sm px-4 text-center">
-                  <p class="mb-2 font-semibold">Ocurrió un error al procesar tu video.</p>
-                  <p class="text-rose-100/80">Intenta volver a subir el archivo más tarde.</p>
-                </div>
+              <video
+                id="video-{{ files.id }}"
+                class="video-js vjs-big-play-centered vjs-default-skin absolute inset-0 w-full h-full object-contain bg-black"
+                controls
+                preload="auto"
+                data-setup='{}'
+              >
+                <source src="{{ url_for('main.file_video', filename=files.ruta_video.split('/')[-1]) }}" type="video/mp4">
+                Tu navegador no soporta el tag de video.
+              </video>
+
+              {% elif files.estado_proceso == 'error' %}
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-rose-200 text-sm px-4 text-center">
+                <p class="mb-2 font-semibold">Ocurrió un error al procesar tu video.</p>
+                <p class="text-rose-100/80">Intenta volver a subir el archivo más tarde.</p>
+              </div>
+
               {% else %}
-                <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-200 text-sm px-4 text-center">
-                  <p class="mb-2 font-medium">Estamos procesando tu video…</p>
-                  <p class="text-slate-400">
-                    La transcripción y traducción se generarán automáticamente.
-                    Puedes navegar por la aplicación y volver a esta página más tarde.
-                  </p>
-                </div>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-200 text-sm px-4 text-center">
+                <p class="mb-2 font-medium">Estamos procesando tu video…</p>
+                <p class="text-slate-400">
+                  La transcripción y traducción se generarán automáticamente.
+                  Puedes navegar por la aplicación y volver a esta página más tarde.
+                </p>
+              </div>
               {% endif %}
             </div>
           </div>
 
-          <div class="lg:col-span-2 space-y-6">
-            {% if completado %}
-              <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 flex flex-col">
-                <h2 class="text-xl font-semibold">Transcripción</h2>
-                <div class="mt-4 max-h-72 overflow-y-auto rounded-lg bg-slate-900/40 ring-1 ring-white/10 p-4">
-                  <p class="text-slate-200 whitespace-pre-line text-sm leading-relaxed">{{ archivo.transcripcion }}</p>
-                </div>
-              </div>
+          {% if completado %}
 
-              <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 flex flex-col">
-                <h2 class="text-xl font-semibold">
-                  Traducción
-                  {% if archivo.idioma_nombre %}
-                    <span class="text-slate-400 text-sm">({{ archivo.idioma_nombre }})</span>
-                  {% endif %}
-                </h2>
-                <div class="mt-4 max-h-72 overflow-y-auto rounded-lg bg-brand-900/20 ring-1 ring-brand-500/30 p-4">
-                  <p class="text-slate-100 whitespace-pre-line text-sm leading-relaxed">{{ archivo.traduccion }}</p>
-                </div>
-                <div class="flex flex-wrap items-center justify-end gap-3 mt-6 pt-4 border-t border-white/10">
-                  <a href="{{ url_for('main.download', archivo_id=archivo.id) }}"
-                     class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-glow">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"/>
-                    </svg>
-                    Descargar .txt
-                  </a>
-                </div>
-              </div>
+          <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 flex flex-col">
+            <h2 class="text-xl font-semibold">
+              Traducción
+              {% if files.idioma_nombre %}
+              <span class="text-slate-400 text-sm">({{ files.idioma_nombre }})</span>
+              {% endif %}
+            </h2>
 
-            {% elif archivo.estado_proceso == 'error' %}
-              <div class="rounded-2xl bg-rose-950 ring-1 ring-rose-500/40 p-6">
-                <h2 class="text-xl font-semibold text-rose-100">Error en el procesamiento</h2>
-                <p class="mt-3 text-sm text-rose-100/90">
-                  Hubo un problema al generar la transcripción o la traducción de este archivo.
-                </p>
-                <p class="mt-4 text-xs text-rose-100/80">
-                  Si el problema persiste no dudes en contactar al soporte.
-                </p>
-              </div>
+            <div class="mt-4 max-h-96 overflow-y-auto rounded-lg bg-brand-900/20 ring-1 ring-brand-500/30 p-4">
+              <p class="text-slate-100 whitespace-pre-line text-sm leading-relaxed">{{ files.traduccion }}</p>
+            </div>
 
-            {% else %}
-              <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6">
-                <h2 class="text-xl font-semibold">Procesando contenido</h2>
-                <p class="mt-3 text-sm text-slate-300">
-                  Estamos generando la transcripción y la traducción de tu archivo.
-                  Una vez finalizado el proceso, verás aquí los detalles del video subido.
-                </p>
-              </div>
-            {% endif %}
+            <div class="flex justify-end mt-6 pt-4 border-t border-white/10">
+              <a href="{{ url_for('main.download', file_id=files.id) }}"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-glow">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
+                </svg>
+                Descargar .txt
+              </a>
+            </div>
           </div>
+
+          <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 flex flex-col">
+            <h2 class="text-xl font-semibold">Transcripción</h2>
+            <div class="mt-4 max-h-96 overflow-y-auto rounded-lg bg-slate-900/40 ring-1 ring-white/10 p-4">
+              <p class="text-slate-200 whitespace-pre-line text-sm leading-relaxed">{{ files.transcripcion }}</p>
+            </div>
+          </div>
+
+          {% elif files.estado_proceso == 'error' %}
+          <div class="rounded-2xl bg-rose-950 ring-1 ring-rose-500/40 p-6">
+            <h2 class="text-xl font-semibold text-rose-100">Error en el procesamiento</h2>
+            <p class="mt-3 text-sm text-rose-100/90">
+              Hubo un problema al generar la transcripción o la traducción.
+            </p>
+            <p class="mt-4 text-xs text-rose-100/80">
+              Si el problema persiste, contacta a soporte.
+            </p>
+          </div>
+
+          {% else %}
+          <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6">
+            <h2 class="text-xl font-semibold">Procesando contenido</h2>
+            <p class="mt-3 text-sm text-slate-300">
+              Estamos generando la transcripción y la traducción de tu archivo.
+            </p>
+          </div>
+          {% endif %}
+
         </div>
 
         {% if completado %}
@@ -170,19 +173,19 @@
             <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
               <div>
                 <dt class="text-slate-400">Nombre original</dt>
-                <dd class="text-slate-100 mt-1 truncate" title="{{ archivo.filename }}">{{ archivo.filename }}</dd>
+                <dd class="text-slate-100 mt-1 truncate" title="{{ files.filename }}">{{ files.filename }}</dd>
               </div>
               <div>
                 <dt class="text-slate-400">Fecha de subida</dt>
-                <dd class="text-slate-100 mt-1">{{ archivo.fecha_subida|format_date("%d/%m/%Y %H:%M") }}</dd>
+                <dd class="text-slate-100 mt-1">{{ files.fecha_subida|format_date("%d/%m/%Y %H:%M") }}</dd>
               </div>
               <div>
                 <dt class="text-slate-400">Idioma</dt>
-                <dd class="text-slate-100 mt-1">{{ archivo.idioma_nombre }}</dd>
+                <dd class="text-slate-100 mt-1">{{ files.idioma_nombre }}</dd>
               </div>
               <div>
                 <dt class="text-slate-400">ID</dt>
-                <dd class="text-slate-100 mt-1 font-mono">{{ archivo.id }}</dd>
+                <dd class="text-slate-100 mt-1 font-mono">{{ files.id }}</dd>
               </div>
             </dl>
           </div>

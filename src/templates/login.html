@@ -37,9 +37,9 @@
         {{ csrf() }}
         {{ form.hidden_tag() if form is defined }}
         <div>
-          <label for="email" class="block mb-2 text-sm font-medium text-slate-200">Correo electrónico</label>
+          <label for="email" class="block mb-2 text-sm font-medium text-slate-200">Correo electrónico:</label>
           <input type="email" name="email" id="email" required
-                 value="{{ request.form.email or '' }}"
+                 value="{{ form_data.email or '' }}"
                  autocomplete="email"
                  class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500" />
           {% if errors and errors.get('email') %}
@@ -48,7 +48,7 @@
         </div>
 
         <div>
-          <label for="password" class="block mb-2 text-sm font-medium text-slate-200">Contraseña</label>
+          <label for="password" class="block mb-2 text-sm font-medium text-slate-200">Contraseña:</label>
           <div class="relative">
             <input type="password" name="password" id="password" required
                    autocomplete="current-password"

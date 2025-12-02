@@ -73,6 +73,7 @@
           <h2 class="text-2xl font-semibold mb-6">Selecciona tu archivo y el idioma de destino</h2>
           <form action="{{ url_for('upload.upload_file') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             {{ csrf() }}
+            {{ form.hidden_tag() if form is defined }}
             <div>
               <label for="language" class="block text-sm font-medium text-slate-200 mb-1">Idioma destino</label>
               <select id="language" name="language" required

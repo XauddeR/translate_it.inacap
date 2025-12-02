@@ -69,14 +69,14 @@
           {% endif %}
         {% endwith %}
 
-        {% if archivos %}
+        {% if files %}
           <div class="space-y-4">
-            {% for archivo in archivos %}
-              <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-5 md:p-6 flex flex-col md:flex-row md:items-center md:gap-6 gap-4" data-card="{{ archivo.id }}">
+            {% for f in files %}
+              <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-5 md:p-6 flex flex-col md:flex-row md:items-center md:gap-6 gap-4" data-card="{{ f.id }}">
                 <div class="flex-shrink-0">
-                  {% if archivo.miniatura_archivo %}
-                    <img src="{{ url_for('main.file_thumbnail', filename=archivo.miniatura_archivo.split('/')[-1]) }}"
-                         alt="Miniatura de {{ archivo.filename }}"
+                  {% if f.miniatura_archivo %}
+                    <img src="{{ url_for('main.file_thumbnail', filename=f.miniatura_archivo.split('/')[-1]) }}"
+                         alt="Miniatura de {{ f.filename }}"
                          class="w-36 h-20 object-cover rounded-lg ring-1 ring-white/10">
                   {% else %}
                     <div class="w-36 h-20 grid place-items-center rounded-lg bg-white/5 ring-1 ring-white/10 text-slate-400 text-xs">
@@ -87,43 +87,43 @@
 
                 <div class="flex-1 min-w-0">
                   <p class="text-base md:text-lg font-semibold text-slate-100 truncate"
-                     title="{{ archivo.nombre_archivo if archivo.nombre_archivo else archivo.filename }}">
-                    {{ archivo.nombre_archivo if archivo.nombre_archivo else archivo.filename }}
+                     title="{{ f.nombre_archivo if f.nombre_archivo else f.filename }}">
+                    {{ f.nombre_archivo if f.nombre_archivo else f.filename }}
                   </p>
-                  <p class="text-xs text-slate-400 mt-1">{{ archivo.fecha_subida|format_date("%d/%m/%Y %H:%M") }}</p>
+                  <p class="text-xs text-slate-400 mt-1">{{ f.fecha_subida|format_date("%d/%m/%Y %H:%M") }}</p>
 
-                  {% if archivo.estado_proceso == 'procesando' %}
+                  {% if f.estado_proceso == 'procesando' %}
                     <div class="mt-2">
                       <div class="flex justify-between text-[11px] text-slate-400 mb-1">
                         <span>Procesando…</span>
-                        <span class="progress-label" data-progress-label="{{ archivo.id }}">{{ archivo.progreso }}%</span>
+                        <span class="progress-label" data-progress-label="{{ f.id }}">{{ f.progreso }}%</span>
                       </div>
                       <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
                         <div class="h-full rounded-full bg-brand-500 progress-bar"
-                            data-progress-bar="{{ archivo.id }}"
-                            style="width: {{ archivo.progreso }}%; transition: width 0.6s ease;"></div>
+                            data-progress-bar="{{ f.id }}"
+                            style="width: {{ f.progreso }}%; transition: width 0.6s ease;"></div>
                       </div>
                     </div>
-                  {% elif archivo.estado_proceso == 'error' %}
+                  {% elif f.estado_proceso == 'error' %}
                     <p class="mt-2 text-xs text-rose-300 font-medium">
                       Ocurrió un error al procesar este archivo. Inténtalo de nuevo más tarde.
                     </p>
-                  {% elif archivo.estado_proceso and archivo.estado_proceso != 'completado' %}
+                  {% elif f.estado_proceso and f.estado_proceso != 'completado' %}
                     <p class="mt-2 text-xs text-slate-400">
-                      Estado: {{ archivo.estado_proceso|capitalize }}
+                      Estado: {{ f.estado_proceso|capitalize }}
                     </p>
                   {% endif %}
                 </div>
 
-                {% if archivo.estado_proceso == 'procesando' %}
+                {% if f.estado_proceso == 'procesando' %}
                   <div class="flex-shrink-0 flex gap-2 w-full md:w-auto justify-end text-[11px] text-slate-400">
                   </div>
-                {% elif archivo.estado_proceso == 'error' %}
+                {% elif f.estado_proceso == 'error' %}
                   <div class="flex-shrink-0 flex gap-2 w-full md:w-auto justify-end">
                     <button type="button"
                             class="btn-delete-file inline-flex items-center justify-center h-10 w-10 rounded-lg bg-white/5 ring-1 ring-white/10 text-rose-200 hover:bg-white/10"
                             title="Eliminar"
-                            data-url="{{ url_for('main.delete_file', archivo_id=archivo.id) }}">
+                            data-url="{{ url_for('main.delete_file', file_id=f.id) }}">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12.54 0c-.27.041-.533.09-.79.143m-4.009 0H4.66a48.609 48.609 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.144-2.032-2.144A48.77 48.77 0 0012 3c-2.392 0-4.744.175-7.032.511C3.84 3.68 3 4.644 3 5.828v.916m7.5 0h-7.5" />
                       </svg>
@@ -131,7 +131,7 @@
                   </div>
                 {% else %}
                   <div class="flex-shrink-0 flex gap-2 w-full md:w-auto justify-end">
-                    <a href="{{ url_for('main.file_detail', archivo_id=archivo.id) }}"
+                    <a href="{{ url_for('main.file_detail', file_id=f.id) }}"
                        title="Ver detalles"
                        class="inline-flex items-center justify-center h-10 w-10 rounded-lg bg-white/5 ring-1 ring-white/10 text-slate-200 hover:bg-white/10">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
@@ -141,7 +141,7 @@
                     </a>
 
                     <button
-                      onclick="openEditModal('{{ archivo.id }}', '{{ archivo.nombre_archivo if archivo.nombre_archivo else archivo.filename }}')"
+                      onclick="openEditModal('{{ f.id }}', '{{ f.nombre_archivo if f.nombre_archivo else f.filename }}')"
                       title="Editar"
                       class="inline-flex items-center justify-center h-10 w-10 rounded-lg bg-white/5 ring-1 ring-white/10 text-amber-200 hover:bg-white/10">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
@@ -152,7 +152,7 @@
                     <button type="button"
                             class="btn-delete-file inline-flex items-center justify-center h-10 w-10 rounded-lg bg-white/5 ring-1 ring-white/10 text-rose-200 hover:bg-white/10"
                             title="Eliminar"
-                            data-url="{{ url_for('main.delete_file', archivo_id=archivo.id) }}">
+                            data-url="{{ url_for('main.delete_file', file_id=f.id) }}">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12.54 0c-.27.041-.533.09-.79.143m-4.009 0H4.66a48.609 48.609 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.144-2.032-2.144A48.77 48.77 0 0012 3c-2.392 0-4.744.175-7.032.511C3.84 3.68 3 4.644 3 5.828v.916m7.5 0h-7.5" />
                       </svg>

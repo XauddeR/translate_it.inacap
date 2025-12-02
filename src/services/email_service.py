@@ -4,7 +4,7 @@ from utils.extensions import mail
 from markupsafe import Markup
 from utils.tokens import generate_reset_token
 
-HTML_TEMPLATE = '''
+HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -68,37 +68,37 @@ HTML_TEMPLATE = '''
   </table>
 </body>
 </html>
-'''
+"""
 
 def send_password_reset_email(user):
-    token = generate_reset_token(user['email'])
+    token = generate_reset_token(user["email"])
 
     reset_url = url_for(
-        'auth.reset_password',
+        "auth.reset_password",
         token = token,
         _external = True
     )
 
-    subject = 'Recuperación de contraseña - Translate It'
+    subject = "Recuperación de contraseña - Translate It"
 
     html_body = HTML_TEMPLATE.format(
-        name = user['usuario'],
+        name = user["usuario"],
         reset_url = reset_url
     )
 
     msg = Message(
         subject = subject,
-        recipients = [user['email']]
+        recipients = [user["email"]]
     )
     msg.html = Markup(html_body)
 
-    msg.body = f'''
+    msg.body = f"""
         Hola {user['usuario']},
 
         Para restablecer tu contraseña, visita este enlace:
         {reset_url}
 
         Si no solicitaste este cambio, puedes ignorar este mensaje.
-    '''
+    """
     
     mail.send(msg)

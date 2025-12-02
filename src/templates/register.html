@@ -39,7 +39,7 @@
         <div>
           <label class="block mb-2 text-sm font-medium text-slate-200">Nombre de usuario:</label>
           <input type="text" name="usuario" required
-                 value="{{ request.form.usuario or '' }}"
+                 value="{{ form_data.usuario or '' }}"
                  class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500" />
           {% if errors and errors.get('usuario') %}
             <p class="mt-2 text-xs text-rose-300">{{ errors.get('usuario')[0] }}</p>
@@ -49,7 +49,7 @@
         <div>
           <label class="block mb-2 text-sm font-medium text-slate-200">Correo electrónico:</label>
           <input type="email" name="email" required
-                 value="{{ request.form.email or '' }}"
+                 value="{{ form_data.email or '' }}"
                  class="w-full rounded-lg bg-slate-900/60 border border-white/10 px-4 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500" />
           {% if errors and errors.get('email') %}
             <p class="mt-2 text-xs text-rose-300">{{ errors.get('email')[0] }}</p>
