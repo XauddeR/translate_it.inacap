@@ -23,7 +23,7 @@ def translateit():
 
     app.config["UPLOAD_FOLDER"] = os.path.join(app.root_path, "uploads", "videos")
     app.config["THUMBNAIL_FOLDER"] = os.path.join(app.root_path, "uploads", "thumbnail")
-    app.config["MAX_CONTENT_LENGTH"] = 200 * 1024 * 1024
+    app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024 
 
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok = True)
     os.makedirs(app.config["THUMBNAIL_FOLDER"], exist_ok = True)
@@ -93,7 +93,7 @@ def translateit():
     
     @app.errorhandler(RequestEntityTooLarge)
     def handle_file_too_large(e):
-        flash("El archivo supera el tamaño máximo permitido (200 MB).", "upload_error")
+        flash("El archivo supera el tamaño máximo permitido (10 MB).", "upload_error")
         return redirect(url_for("upload.upload_file"))
     
     @app.errorhandler(429)

@@ -5,7 +5,7 @@ from utils.extensions import socketio
 def handle_connect():
     print("Cliente conectado")
 
-@socketio.on('disconnect')
+@socketio.on("disconnect")
 def handle_disconnect():
     print("Cliente desconectado")
 
