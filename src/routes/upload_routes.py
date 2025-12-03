@@ -105,7 +105,7 @@ def upload_file():
                     progreso = 0,
                     error_mensaje = "El archivo no contiene un stream de video válido."
                 )
-
+                
                 try:
                     if os.path.exists(temp_path):
                         os.remove(temp_path)
