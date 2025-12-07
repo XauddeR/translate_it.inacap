@@ -73,6 +73,7 @@ def file_detail(file_id):
 
     return render_template("file_detail.html", files = files)
 
+
 @main_bp.route("/archivo/video/<filename>")
 @login_required
 def file_video(filename):
@@ -99,7 +100,7 @@ def file_thumbnail(filename):
 
 @main_bp.route("/update_file/<file_id>", methods = ["POST"])
 @login_required
-def update_file(archivo_id):
+def update_file(file_id):
     new_file_name = request.form["filename"].strip()
 
     if not new_file_name:
@@ -117,7 +118,7 @@ def update_file(archivo_id):
         SET nombre_archivo = %s 
         WHERE id = %s AND usuario_id = %s
         """,
-        (new_file_name, archivo_id, current_user.id)
+        (new_file_name, file_id, current_user.id)
     )
     mysql.connection.commit()
     cursor.close()
