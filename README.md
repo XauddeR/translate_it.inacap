@@ -2,3 +2,12 @@ Translate It es un proyecto de título que busca reducir la brecha idiomática e
 
 Actualmente la aplicación cumple con entregar la transcripción de un video subido en el idioma seleccionado por el usuario.
 Se busca actualizar este proyecto con el objetivo de generar subtitulación total del video cargado.
+
+**Tecnologías utilizadas**
+- OpenAI Whisper API.
+- DeepL API.
+- Framework Flask.
+- Librerías necesarias (requirements.txt).
+- TailwindCSS.
+- Python.
+- JavaScript.
